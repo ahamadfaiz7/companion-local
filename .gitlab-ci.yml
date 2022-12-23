@@ -1,0 +1,231 @@
+# image: quay.io/docker/stable
+
+# image: registry.flexpay.co.za:5000/flexpay-docker:20.10.14
+# services:
+#   - registry.flexpay.co.za:5000/flexpay-docker:20.10.14-dind
+
+image: docker:20.10.14
+services:
+  - docker:20.10.14-dind
+
+
+variables:
+  GIT_STRATEGY: clone
+  # Make sure that you get tags from git repository otherwise the release
+  # Gradle plugin will not be able to create the next version number:
+  GIT_FETCH_EXTRA_FLAGS: --tags
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.java.home=/opt/openjdk-17"
+  APP_VERSION: $CI_PIPELINE_IID
+  TAG_REGISTRY: registry.flexpay.co.za:5000
+  TAG_DEV: $TAG_REGISTRY/companion-local-dev
+  TAG_PREPROD: $TAG_REGISTRY/companion-local-preprod
+  TAG_PROD: $TAG_REGISTRY/companion-local-prod
+  TAG_LATEST: registry.flexpay.co.za:5000/companion-local:latest
+  TAG_COMMIT: registry.flexpay.co.za:5000/companion-local/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA
+  DEV_SERVER: fp-dev-dh1
+  PREPROD_SERVER: fp-preprod-dh1
+  PROD_SERVER: fp-prod-dh1
+
+before_script:
+  - echo `pwd` # debug
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+stages:
+  - .pre
+  - test
+  - Test and Lint
+  - build
+  - Build develop
+  - Deploy develop
+  - Build preprod
+  - Deploy preprod
+  - Build prod
+  - Deploy prod
+
+include:
+  - template: Security/SAST.gitlab-ci.yml
+
+spotbugs-sast:
+  tags:
+    - fp-prod-onprem
+  variables:
+    SECURE_LOG_LEVEL: "debug"
+    SAST_ANALYZER_IMAGE: "registry.gitlab.com/gitlab-org/security-products/analyzers/spotbugs:2.28.4"
+    COMPILE: "false"
+  artifacts:
+    reports:
+      sast: gl-sast-report.json
+
+.build:
+  stage: build
+  image: openjdk:17-alpine
+  tags:
+    - fp-prod-onprem
+  script:
+    - |
+    #   if [[ $CI_COMMIT_BRANCH =~ "^release*" ]]; then
+    #   cat ./src/main/resources/application-preprod.properties > ./src/main/resources/application.properties
+    #   elif [[ $CI_COMMIT_TAG == *-release ]]; then
+    #   cat ./src/main/resources/application-prod.properties > ./src/main/resources/application.properties
+    #   else
+    #   cat ./src/main/resources/application-dev.properties > ./src/main/resources/application.properties
+    #   echo $CI_COMMIT_BRANCH
+    #   fi
+
+    # - cat ./src/main/resources/application.properties | grep "flexpay.mobile-api.service.url"
+    - ./gradlew  build
+
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: push
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    paths:
+      - build/libs/*.jar
+    expire_in: 4 hrs
+
+.test:
+  tags:
+    - fp-prod-onprem
+  stage: test
+  image: openjdk:17-alpine
+  script: ./gradlew check
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+
+.build_image:
+  tags:
+    - fp-prod-onprem
+  script:
+    - echo $CI_COMMIT_BRANCH
+    - echo $FP_CI_REGISTRY_PASSWORD | docker login  -u $FP_CI_REGISTRY_USER $FP_CI_REGISTRY --password-stdin
+    - docker build  -f Dockerfile -t ${REGISTRY_REPOSITORY}:${CI_COMMIT_SHORT_SHA} .
+    - docker tag ${REGISTRY_REPOSITORY}:${CI_COMMIT_SHORT_SHA} ${REGISTRY_REPOSITORY}
+    - docker image ls
+    - docker push --all-tags ${REGISTRY_REPOSITORY}
+    # - docker push --tls-verify=true ${REGISTRY_REPOSITORY}
+    # - docker push --tls-verify=false ${REGISTRY_REPOSITORY}:$CI_COMMIT_SHORT_SHA
+
+.deploy_image:
+  tags:
+    - fp-prod-onprem
+  image: alpine:latest
+  script:
+    - apk update && apk add openssh-client
+    - mkdir -p ~/.ssh
+    - echo "$DEV_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - eval $(ssh-agent -s)
+    - ssh-add ~/.ssh/id_rsa
+    # - echo $FP_CI_REGISTRY_PASSWORD | ssh -i ~/.ssh/id_rsa -t -oStrictHostKeyChecking=no "dev_deploy@docsrv" 'docker login  -u $FP_CI_REGISTRY_USER $FP_CI_REGISTRY --password-stdin'
+    - ssh -i ~/.ssh/id_rsa -t -oStrictHostKeyChecking=no "dev_deploy@${SERVER}" 'cd /opt/docker/containers/companion-local && docker-compose down --remove-orphans'
+    - ssh -i ~/.ssh/id_rsa -t -oStrictHostKeyChecking=no "dev_deploy@${SERVER}" "docker rmi ${REGISTRY_REPOSITORY} || docker pull"
+    - ssh -i ~/.ssh/id_rsa -t -oStrictHostKeyChecking=no "dev_deploy@${SERVER}" 'cd /opt/docker/containers/companion-local && docker-compose up -d'
+
+.sonarcloud-check:
+  stage: test
+  image: openjdk:17-alpine
+  tags:
+    - fp-prod-onprem
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
+    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+    SONAR_ORGANISATION: "paymento"
+    SONAR_PROJECT_KEY: "paymento_$CI_PROJECT_ID"
+  script:
+    - ./gradlew sonarqube -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=$SONAR_ORGANISATION -Ddependency-check.skip=true -Dproguard.skip=true -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.projectName="$CI_PROJECT_TITLE"
+
+#  ./gradlew -Dsonar.host.url=http://myhost:9000 sonarqube
+
+##############################
+#   Develop Stage
+##############################
+
+build_dev:
+  extends: .build
+  only:
+    - develop
+
+build dev image:
+  extends: .build_image
+  stage: Build develop
+  variables:
+    REGISTRY_REPOSITORY: $TAG_DEV
+  before_script:
+    - echo "Building dev image"
+  only:
+  - develop
+
+deploy_devsrv:
+  variables:
+    SERVER: $DEV_SERVER
+    REGISTRY_REPOSITORY: $TAG_DEV
+  # image: alpine:latest
+  extends: .deploy_image
+  stage: Deploy develop
+  only:
+  - develop
+
+##############################
+#   Preprod Stage
+##############################
+
+build_preprod:
+  extends: .build
+  only:
+    - "/^release/"
+
+build preprod image:
+  extends: .build_image
+  stage: Build preprod
+  variables:
+    REGISTRY_REPOSITORY: $TAG_PREPROD
+  only:
+    # - release-*
+    - "/^release/"
+
+deploy_preprod:
+  variables:
+    SERVER: $PREPROD_SERVER
+    REGISTRY_REPOSITORY: $TAG_PREPROD
+  stage: Deploy preprod
+  dependencies:
+    - build preprod image
+  extends: .deploy_image
+  only:
+    - "/^release/"
+
+###############################
+#   Prod Stage
+###############################
+
+build_prod:
+  extends: .build
+  rules:
+    - if: "$CI_COMMIT_TAG =~ /^*-release$/"
+
+build prod image:
+  extends: .build_image
+  stage: Build prod
+  variables:
+    REGISTRY_REPOSITORY: $TAG_PROD
+  rules:
+    - if: "$CI_COMMIT_TAG =~ /^*-release$/"
+
+deploy_prod:
+  variables:
+    SERVER: $PROD_SERVER
+    REGISTRY_REPOSITORY: $TAG_PROD
+  stage: Deploy prod
+  dependencies:
+    - build prod image
+  extends: .deploy_image
+  rules:
+    - if: "$CI_COMMIT_TAG =~ /^*-release$/"
+  when: manual
