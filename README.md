@@ -4,6 +4,39 @@ Repository that is used for companion-local
 
 ## Getting started
 
+# Read Me First
+The following was discovered as part of building this project:
+
+* The original package name 'com.companion.local' is valid. Please follow the same package hierarchy.
+
+# The request endpoint will be to test this springboot application is -> http://localhost:5004/companion-local/api/local.createLinkedCard
+
+It will internally call -> **https://companion.uat.tutuka.cloud/v2_0/XmlRpc.cfm**
+and responds with the similar response as companion api
+
+sample request
+------------------
+{
+"methodName": "CreateLinkedCard",
+"reference": "1372123433",
+"firstName": "Ali",
+"lastName": "Khan",
+"idOrPassport": "Z765765I76576",
+"cellphoneNumber":"20401010T10:10:10",
+"expiryDate": "20401010T10:10:10",
+"transactionId": "6beebbae-98c2-4d74-97a8-a070645f4147",
+"transactionDate": "20221216T10:10:10"
+}
+
+sample response
+------------------
+{
+"cardNumber": "5371******467777",
+"expiryDate": "10/40",
+"cvv": "182",
+"trackingNumber": "662715500000033"
+}
+
 To make it easy for you to get started with GitLab, here's a list of recommended next steps.
 
 Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
