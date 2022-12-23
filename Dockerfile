@@ -5,7 +5,7 @@ USER spring:spring
 
 WORKDIR /app
 VOLUME /tmp
-COPY build/libs/companion-remote-0.0.1-SNAPSHOT.jar /app/app.jar
+COPY build/libs/*-SNAPSHOT.jar /app/app.jar
 
 EXPOSE 5004
 
