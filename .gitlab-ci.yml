@@ -1,13 +1,9 @@
-# image: quay.io/docker/stable
-
-# image: registry.flexpay.co.za:5000/flexpay-docker:20.10.14
-# services:
-#   - registry.flexpay.co.za:5000/flexpay-docker:20.10.14-dind
+include:
+  - template: Security/SAST.gitlab-ci.yml
 
 image: docker:20.10.14
 services:
   - docker:20.10.14-dind
-
 
 variables:
   GIT_STRATEGY: clone
@@ -34,6 +30,7 @@ stages:
   - .pre
   - test
   - Test and Lint
+  - code coverage
   - build
   - Build develop
   - Deploy develop
@@ -41,9 +38,6 @@ stages:
   - Deploy preprod
   - Build prod
   - Deploy prod
-
-include:
-  - template: Security/SAST.gitlab-ci.yml
 
 spotbugs-sast:
   tags:
@@ -55,6 +49,28 @@ spotbugs-sast:
   artifacts:
     reports:
       sast: gl-sast-report.json
+
+sonarcloud-check:
+  stage: test
+  image: gradle:alpine
+  tags:
+    - fp-prod-onprem
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar" # Defines the location of the analysis task cache
+    GIT_DEPTH: "0" # Tells git to fetch all the branches of the project, required by the analysis task
+    SONAR_ORGANISATION: "paymento"
+    SONAR_PROJECT_KEY: "paymento_$CI_PROJECT_ID"
+  script:
+    - apk update && apk upgrade && apk add --no-cache bash
+    - echo $JAVA_HOME
+    - ./gradlew -Dorg.gradle.java.home=$JAVA_HOME -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=$SONAR_ORGANISATION -Ddependency-check.skip=true -Dproguard.skip=true -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.projectName="$CI_PROJECT_TITLE" sonar
+  # only:
+  #   - merge_requests
+  #   - master
 
 .build:
   stage: build
@@ -128,18 +144,6 @@ spotbugs-sast:
     - ssh -i ~/.ssh/id_rsa -t -oStrictHostKeyChecking=no "dev_deploy@${SERVER}" "docker rmi ${REGISTRY_REPOSITORY} || docker pull registry.flexpay.co.za:5000/companion-local-dev"
     - ssh -i ~/.ssh/id_rsa -t -oStrictHostKeyChecking=no "dev_deploy@${SERVER}" 'cd /opt/docker/containers/companion-local && docker-compose up -d'
 
-.sonarcloud-check:
-  stage: test
-  image: openjdk:17-alpine
-  tags:
-    - fp-prod-onprem
-  variables:
-    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
-    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
-    SONAR_ORGANISATION: "paymento"
-    SONAR_PROJECT_KEY: "paymento_$CI_PROJECT_ID"
-  script:
-    - ./gradlew sonarqube -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=$SONAR_ORGANISATION -Ddependency-check.skip=true -Dproguard.skip=true -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.projectName="$CI_PROJECT_TITLE"
 
 #  ./gradlew -Dsonar.host.url=http://myhost:9000 sonarqube
 
@@ -160,7 +164,7 @@ build dev image:
   before_script:
     - echo "Building dev image"
   only:
-  - develop
+    - develop
 
 deploy_devsrv:
   variables:
@@ -170,7 +174,7 @@ deploy_devsrv:
   extends: .deploy_image
   stage: Deploy develop
   only:
-  - develop
+    - develop
 
 ##############################
 #   Preprod Stage
