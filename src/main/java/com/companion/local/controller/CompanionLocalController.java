@@ -1,8 +1,8 @@
 package com.companion.local.controller;
 
 
-import com.companion.local.model.CreateLinkedCardRequest;
-import com.companion.local.model.CreateLinkedCardResponse;
+import com.companion.local.model.*;
+import com.companion.local.model.LinkedCards.Data;
 import com.companion.local.request.MethodCall;
 import com.companion.local.request.Param;
 import com.companion.local.request.Params;
@@ -24,6 +24,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.StringReader;
@@ -50,8 +51,271 @@ public class CompanionLocalController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(value = "/local.createLinkedCard")
-    public ResponseEntity<CreateLinkedCardResponse> createCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody CreateLinkedCardRequest request) {
-        CreateLinkedCardResponse response = new CreateLinkedCardResponse();
+    public ResponseEntity<List<CreateLinkedCardResponse>> createCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody List<CreateLinkedCardRequest> requestList) {
+
+        List<CreateLinkedCardResponse> responseList = new ArrayList<CreateLinkedCardResponse>();
+        for (CreateLinkedCardRequest request : requestList) {
+            CreateLinkedCardResponse response = new CreateLinkedCardResponse();
+            MethodCall methodCall = new MethodCall();
+            Params params = new Params();
+            List<Param> paramList = new ArrayList<>();
+
+            Param param1 = new Param();
+            com.companion.local.request.Value value1 = new com.companion.local.request.Value();
+            value1.setString("0030069501");
+            param1.setValue(value1);
+            paramList.add(param1);
+
+            Param param2 = new Param();
+            com.companion.local.request.Value value2 = new com.companion.local.request.Value();
+            value2.setString(request.getReference());
+            param2.setValue(value2);
+            paramList.add(param2);
+
+            Param param3 = new Param();
+            com.companion.local.request.Value value3 = new com.companion.local.request.Value();
+            value3.setString(request.getFirstName());
+            param3.setValue(value3);
+            paramList.add(param3);
+
+            Param param4 = new Param();
+            com.companion.local.request.Value value4 = new com.companion.local.request.Value();
+            value4.setString(request.getLastName());
+            param4.setValue(value4);
+            paramList.add(param4);
+
+            Param param5 = new Param();
+            com.companion.local.request.Value value5 = new com.companion.local.request.Value();
+            value5.setString(request.getIdOrPassport());
+            param5.setValue(value5);
+            paramList.add(param5);
+
+            Param param6 = new Param();
+            com.companion.local.request.Value value6 = new com.companion.local.request.Value();
+            value6.setString(request.getCellphoneNumber());
+            param6.setValue(value6);
+            paramList.add(param6);
+
+            Param param7 = new Param();
+            com.companion.local.request.Value value7 = new com.companion.local.request.Value();
+            value7.setDateTimeIso8601(request.getExpiryDate());
+            param7.setValue(value7);
+            paramList.add(param7);
+
+            Param param8 = new Param();
+            com.companion.local.request.Value value8 = new com.companion.local.request.Value();
+            value8.setString(request.getTransactionId());
+            param8.setValue(value8);
+            paramList.add(param8);
+
+            Param param9 = new Param();
+            com.companion.local.request.Value value9 = new com.companion.local.request.Value();
+            value9.setDateTimeIso8601(request.getTransactionDate());
+            param9.setValue(value9);
+            paramList.add(param9);
+
+            Param param10 = new Param();
+            com.companion.local.request.Value value10 = new com.companion.local.request.Value();
+            value10.setString("");
+            param10.setValue(value10);
+            paramList.add(param10);
+
+            params.setParam(paramList);
+            methodCall.setMethodName("CreateLinkedCard");
+            methodCall.setParams(params);
+
+            String responseFromCompanionApi = null;
+
+            try {
+                responseFromCompanionApi = restTemplate.postForObject(companionTutukaEndpoint, generateRequestXmlString(methodCall), String.class);
+                DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                InputSource is = new InputSource();
+                is.setCharacterStream(new StringReader(responseFromCompanionApi));
+
+                Document doc = db.parse(is);
+                NodeList nodes = doc.getElementsByTagName("value");
+
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    Element element = (Element) nodes.item(i);
+                    NodeList name = element.getElementsByTagName("string");
+                    response.setCvv(getCharacterDataFromElement((Element) name.item(0)));
+                    response.setCardNumber(getCharacterDataFromElement((Element) name.item(1)));
+                    response.setExpiryDate(getCharacterDataFromElement((Element) name.item(3)));
+                    response.setTrackingNumber(getCharacterDataFromElement((Element) name.item(4)));
+                    break;
+                }
+                response.setResponseStatus("SUCCESS");
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.setResponseStatus("FAILED");
+            }
+            responseList.add(response);
+        }
+        return new ResponseEntity(responseList, HttpStatus.OK);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping(value = "/local.activateCard")
+    public ResponseEntity<List<ActivateCardResponse>> activateCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody List<ActivateCardRequest> requestList) {
+
+        List<ActivateCardResponse> responseList = new ArrayList<ActivateCardResponse>();
+        for (ActivateCardRequest request : requestList) {
+            ActivateCardResponse response = new ActivateCardResponse();
+            response.setCardIdentifier(request.getCardIdentifier());
+            MethodCall methodCall = new MethodCall();
+            Params params = new Params();
+            List<Param> paramList = new ArrayList<>();
+
+            Param param1 = new Param();
+            com.companion.local.request.Value value1 = new com.companion.local.request.Value();
+            value1.setString("0030069501");
+            param1.setValue(value1);
+            paramList.add(param1);
+
+            Param param2 = new Param();
+            com.companion.local.request.Value value2 = new com.companion.local.request.Value();
+            value2.setString(request.getCardIdentifier());
+            param2.setValue(value2);
+            paramList.add(param2);
+
+            Param param3 = new Param();
+            com.companion.local.request.Value value3 = new com.companion.local.request.Value();
+            value3.setString(request.getTransactionId());
+            param3.setValue(value3);
+            paramList.add(param3);
+
+            Param param4 = new Param();
+            com.companion.local.request.Value value4 = new com.companion.local.request.Value();
+            value4.setDateTimeIso8601(request.getTransactionDate());
+            param4.setValue(value4);
+            paramList.add(param4);
+
+            Param param5 = new Param();
+            com.companion.local.request.Value value5 = new com.companion.local.request.Value();
+            value5.setString("");
+            param5.setValue(value5);
+            paramList.add(param5);
+
+
+            params.setParam(paramList);
+            methodCall.setMethodName("ActivateCard");
+            methodCall.setParams(params);
+
+            String responseFromCompanionApi = null;
+
+            try {
+                responseFromCompanionApi = restTemplate.postForObject(companionTutukaEndpoint, generateRequestXmlString(methodCall), String.class);
+                DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                InputSource is = new InputSource();
+                is.setCharacterStream(new StringReader(responseFromCompanionApi));
+
+                Document doc = db.parse(is);
+                NodeList nodes = doc.getElementsByTagName("value");
+
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    Element element = (Element) nodes.item(i);
+                    NodeList name = element.getElementsByTagName("string");
+                    response.setResponseStatus(getCharacterDataFromElement((Element) name.item(0)));
+                    break;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.setResponseStatus("FAILED");
+            }
+            responseList.add(response);
+        }
+        return new ResponseEntity(responseList, HttpStatus.OK);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping(value = "/local.changePin")
+    public ResponseEntity<List<CardResponse>> changePin(@RequestHeader MultiValueMap<String, String> headers, @RequestBody List<CardRequest> requestList) {
+
+        List<CardResponse> responseList = new ArrayList<CardResponse>();
+        for (CardRequest request : requestList) {
+            CardResponse response = new CardResponse();
+            response.setCardIdentifier(request.getCardIdentifier());
+            MethodCall methodCall = new MethodCall();
+            Params params = new Params();
+            List<Param> paramList = new ArrayList<>();
+
+            Param param1 = new Param();
+            com.companion.local.request.Value value1 = new com.companion.local.request.Value();
+            value1.setString("0030069501");
+            param1.setValue(value1);
+            paramList.add(param1);
+
+            Param param2 = new Param();
+            com.companion.local.request.Value value2 = new com.companion.local.request.Value();
+            value2.setString(request.getReference());
+            param2.setValue(value2);
+            paramList.add(param2);
+
+            Param param3 = new Param();
+            com.companion.local.request.Value value3 = new com.companion.local.request.Value();
+            value3.setString(request.getCardIdentifier());
+            param3.setValue(value3);
+            paramList.add(param3);
+
+            Param param4 = new Param();
+            com.companion.local.request.Value value4 = new com.companion.local.request.Value();
+            value4.setString(request.getNewPIN());
+            param4.setValue(value4);
+            paramList.add(param4);
+
+            Param param5 = new Param();
+            com.companion.local.request.Value value5 = new com.companion.local.request.Value();
+            value5.setString(request.getTransactionId());
+            param5.setValue(value5);
+            paramList.add(param5);
+
+            Param param6 = new Param();
+            com.companion.local.request.Value value6 = new com.companion.local.request.Value();
+            value6.setDateTimeIso8601(request.getTransactionDate());
+            param6.setValue(value6);
+            paramList.add(param6);
+
+            Param param7 = new Param();
+            com.companion.local.request.Value value7 = new com.companion.local.request.Value();
+            value7.setString("");
+            param7.setValue(value7);
+            paramList.add(param7);
+
+
+            params.setParam(paramList);
+            methodCall.setMethodName("ChangePin");
+            methodCall.setParams(params);
+
+            String responseFromCompanionApi = null;
+
+            try {
+                responseFromCompanionApi = restTemplate.postForObject(companionTutukaEndpoint, generateRequestXmlString(methodCall), String.class);
+                DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                InputSource is = new InputSource();
+                is.setCharacterStream(new StringReader(responseFromCompanionApi));
+
+                Document doc = db.parse(is);
+                NodeList nodes = doc.getElementsByTagName("value");
+
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    Element element = (Element) nodes.item(i);
+                    NodeList name = element.getElementsByTagName("string");
+                    response.setResponseStatus(getCharacterDataFromElement((Element) name.item(0)));
+                    break;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.setResponseStatus("FAILED");
+            }
+            responseList.add(response);
+        }
+        return new ResponseEntity(responseList, HttpStatus.OK);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping(value = "/local.getActiveLinkedCards")
+    public ResponseEntity<List<CreateLinkedCardResponse>> getActiveLinkedCards(@RequestHeader MultiValueMap<String, String> headers, @RequestBody CreateLinkedCardRequest request) {
+        List<CreateLinkedCardResponse> responseList = new ArrayList<CreateLinkedCardResponse>();
         MethodCall methodCall = new MethodCall();
         Params params = new Params();
         List<Param> paramList = new ArrayList<>();
@@ -70,82 +334,546 @@ public class CompanionLocalController {
 
         Param param3 = new Param();
         com.companion.local.request.Value value3 = new com.companion.local.request.Value();
-        value3.setString(request.getFirstName());
+        value3.setString(request.getTransactionId());
         param3.setValue(value3);
         paramList.add(param3);
 
         Param param4 = new Param();
         com.companion.local.request.Value value4 = new com.companion.local.request.Value();
-        value4.setString(request.getLastName());
+        value4.setDateTimeIso8601(request.getTransactionDate());
         param4.setValue(value4);
         paramList.add(param4);
 
         Param param5 = new Param();
         com.companion.local.request.Value value5 = new com.companion.local.request.Value();
-        value5.setString(request.getIdOrPassport());
+        value5.setString("");
         param5.setValue(value5);
         paramList.add(param5);
 
-        Param param6 = new Param();
-        com.companion.local.request.Value value6 = new com.companion.local.request.Value();
-        value6.setString(request.getCellphoneNumber());
-        param6.setValue(value6);
-        paramList.add(param6);
-
-        Param param7 = new Param();
-        com.companion.local.request.Value value7 = new com.companion.local.request.Value();
-        value7.setDateTimeIso8601(request.getExpiryDate());
-        param7.setValue(value7);
-        paramList.add(param7);
-
-        Param param8 = new Param();
-        com.companion.local.request.Value value8 = new com.companion.local.request.Value();
-        value8.setString(request.getTransactionId());
-        param8.setValue(value8);
-        paramList.add(param8);
-
-        Param param9 = new Param();
-        com.companion.local.request.Value value9 = new com.companion.local.request.Value();
-        value9.setDateTimeIso8601(request.getTransactionDate());
-        param9.setValue(value9);
-        paramList.add(param9);
-
-        Param param10 = new Param();
-        com.companion.local.request.Value value10 = new com.companion.local.request.Value();
-        value10.setString("");
-        param10.setValue(value10);
-        paramList.add(param10);
 
         params.setParam(paramList);
-        methodCall.setMethodName("CreateLinkedCard");
+        methodCall.setMethodName("GetActiveLinkedCards");
         methodCall.setParams(params);
 
         String responseFromCompanionApi = null;
 
         try {
             responseFromCompanionApi = restTemplate.postForObject(companionTutukaEndpoint, generateRequestXmlString(methodCall), String.class);
-            DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            InputSource is = new InputSource();
-            is.setCharacterStream(new StringReader(responseFromCompanionApi));
+            String dataString = responseFromCompanionApi.substring(responseFromCompanionApi.indexOf("<array>") + 7, responseFromCompanionApi.indexOf("</array>"));
 
-            Document doc = db.parse(is);
-            NodeList nodes = doc.getElementsByTagName("value");
+            JAXBContext marshal = JAXBContext.newInstance(Data.class);
+            Unmarshaller unmarshaller = marshal.createUnmarshaller();
 
-            for (int i = 0; i < nodes.getLength(); i++) {
-                Element element = (Element) nodes.item(i);
-                NodeList name = element.getElementsByTagName("string");
-                response.setCvv(getCharacterDataFromElement((Element) name.item(0)));
-                response.setCardNumber(getCharacterDataFromElement((Element) name.item(1)));
-                response.setExpiryDate(getCharacterDataFromElement((Element) name.item(3)));
-                response.setTrackingNumber(getCharacterDataFromElement((Element) name.item(4)));
-                break;
+            StringReader reader = new StringReader(dataString);
+            Data data = (Data) unmarshaller.unmarshal(reader);
+
+            for (com.companion.local.model.LinkedCards.Value value : data.getValue()) {
+                CreateLinkedCardResponse response = new CreateLinkedCardResponse();
+                response.setCvv(value.getStruct().getMember().get(0).getValue().getString());
+                response.setCardNumber(value.getStruct().getMember().get(1).getValue().getString());
+                response.setExpiryDate(value.getStruct().getMember().get(2).getValue().getString());
+                response.setTrackingNumber(value.getStruct().getMember().get(4).getValue().getString());
+                response.setResponseStatus("Approved");
+                responseList.add(response);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(responseList, HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity(response, HttpStatus.OK);
 
+        return new ResponseEntity(responseList, HttpStatus.OK);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping(value = "/local.retireCard")
+    public ResponseEntity<List<CardResponse>> retireCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody List<RetireCardRequest> requestList) {
+
+        List<CardResponse> responseList = new ArrayList<CardResponse>();
+        for (RetireCardRequest request : requestList) {
+            CardResponse response = new CardResponse();
+            response.setCardIdentifier(request.getCardIdentifier());
+            MethodCall methodCall = new MethodCall();
+            Params params = new Params();
+            List<Param> paramList = new ArrayList<>();
+
+            Param param1 = new Param();
+            com.companion.local.request.Value value1 = new com.companion.local.request.Value();
+            value1.setString("0030069501");
+            param1.setValue(value1);
+            paramList.add(param1);
+
+            Param param2 = new Param();
+            com.companion.local.request.Value value2 = new com.companion.local.request.Value();
+            value2.setString(request.getReference());
+            param2.setValue(value2);
+            paramList.add(param2);
+
+            Param param3 = new Param();
+            com.companion.local.request.Value value3 = new com.companion.local.request.Value();
+            value3.setString(request.getCardIdentifier());
+            param3.setValue(value3);
+            paramList.add(param3);
+
+            Param param4 = new Param();
+            com.companion.local.request.Value value4 = new com.companion.local.request.Value();
+            value4.setString(request.getTransactionId());
+            param4.setValue(value4);
+            paramList.add(param4);
+
+            Param param5 = new Param();
+            com.companion.local.request.Value value5 = new com.companion.local.request.Value();
+            value5.setDateTimeIso8601(request.getTransactionDate());
+            param5.setValue(value5);
+            paramList.add(param5);
+
+            Param param6 = new Param();
+            com.companion.local.request.Value value6 = new com.companion.local.request.Value();
+            value6.setString("");
+            param6.setValue(value6);
+            paramList.add(param6);
+
+
+            params.setParam(paramList);
+            methodCall.setMethodName("RetireCard");
+            methodCall.setParams(params);
+
+            String responseFromCompanionApi = null;
+
+            try {
+                responseFromCompanionApi = restTemplate.postForObject(companionTutukaEndpoint, generateRequestXmlString(methodCall), String.class);
+                DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                InputSource is = new InputSource();
+                is.setCharacterStream(new StringReader(responseFromCompanionApi));
+
+                Document doc = db.parse(is);
+                NodeList nodes = doc.getElementsByTagName("value");
+
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    Element element = (Element) nodes.item(i);
+                    NodeList name = element.getElementsByTagName("string");
+                    response.setResponseStatus(getCharacterDataFromElement((Element) name.item(0)));
+                    break;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.setResponseStatus("FAILED");
+            }
+            responseList.add(response);
+        }
+        return new ResponseEntity(responseList, HttpStatus.OK);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping(value = "/local.updateBearer")
+    public ResponseEntity<List<CardResponse>> updateBearer(@RequestHeader MultiValueMap<String, String> headers, @RequestBody List<UpdateBearerRequest> requestList) {
+
+        List<CardResponse> responseList = new ArrayList<CardResponse>();
+        for (UpdateBearerRequest request : requestList) {
+            CardResponse response = new CardResponse();
+            response.setCardIdentifier(request.getCardIdentifier());
+            MethodCall methodCall = new MethodCall();
+            Params params = new Params();
+            List<Param> paramList = new ArrayList<>();
+
+            Param param1 = new Param();
+            com.companion.local.request.Value value1 = new com.companion.local.request.Value();
+            value1.setString("0030069501");
+            param1.setValue(value1);
+            paramList.add(param1);
+
+            Param param2 = new Param();
+            com.companion.local.request.Value value2 = new com.companion.local.request.Value();
+            value2.setString(request.getReference());
+            param2.setValue(value2);
+            paramList.add(param2);
+
+            Param param3 = new Param();
+            com.companion.local.request.Value value3 = new com.companion.local.request.Value();
+            value3.setString(request.getCardIdentifier());
+            param3.setValue(value3);
+            paramList.add(param3);
+
+            Param param4 = new Param();
+            com.companion.local.request.Value value4 = new com.companion.local.request.Value();
+            value4.setString(request.getFirstName());
+            param4.setValue(value4);
+            paramList.add(param4);
+
+            Param param5 = new Param();
+            com.companion.local.request.Value value5 = new com.companion.local.request.Value();
+            value5.setString(request.getLastName());
+            param5.setValue(value5);
+            paramList.add(param5);
+
+            Param param6 = new Param();
+            com.companion.local.request.Value value6 = new com.companion.local.request.Value();
+            value6.setString(request.getIdOrPassport());
+            param6.setValue(value6);
+            paramList.add(param6);
+
+            Param param7 = new Param();
+            com.companion.local.request.Value value7 = new com.companion.local.request.Value();
+            value7.setString(request.getCellphoneNumber());
+            param7.setValue(value7);
+            paramList.add(param7);
+
+            Param param8 = new Param();
+            com.companion.local.request.Value value8 = new com.companion.local.request.Value();
+            value8.setString(request.getTransactionId());
+            param8.setValue(value8);
+            paramList.add(param8);
+
+            Param param9 = new Param();
+            com.companion.local.request.Value value9 = new com.companion.local.request.Value();
+            value9.setDateTimeIso8601(request.getTransactionDate());
+            param9.setValue(value9);
+            paramList.add(param9);
+
+            Param param10 = new Param();
+            com.companion.local.request.Value value10 = new com.companion.local.request.Value();
+            value10.setString("");
+            param10.setValue(value10);
+            paramList.add(param10);
+
+            params.setParam(paramList);
+            methodCall.setMethodName("UpdateBearer");
+            methodCall.setParams(params);
+
+            String responseFromCompanionApi = null;
+
+            try {
+                responseFromCompanionApi = restTemplate.postForObject(companionTutukaEndpoint, generateRequestXmlString(methodCall), String.class);
+                DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                InputSource is = new InputSource();
+                is.setCharacterStream(new StringReader(responseFromCompanionApi));
+
+                Document doc = db.parse(is);
+                NodeList nodes = doc.getElementsByTagName("value");
+
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    Element element = (Element) nodes.item(i);
+                    NodeList name = element.getElementsByTagName("string");
+                    response.setResponseStatus(getCharacterDataFromElement((Element) name.item(0)));
+                    break;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.setResponseStatus("FAILED");
+            }
+            responseList.add(response);
+        }
+        return new ResponseEntity(responseList, HttpStatus.OK);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping(value = "/local.stopCard")
+    public ResponseEntity<List<CardResponse>> stopCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody List<StopCardRequest> requestList) {
+
+        List<CardResponse> responseList = new ArrayList<CardResponse>();
+        for (StopCardRequest request : requestList) {
+            CardResponse response = new CardResponse();
+            response.setCardIdentifier(request.getCardIdentifier());
+            MethodCall methodCall = new MethodCall();
+            Params params = new Params();
+            List<Param> paramList = new ArrayList<>();
+
+            Param param1 = new Param();
+            com.companion.local.request.Value value1 = new com.companion.local.request.Value();
+            value1.setString("0030069501");
+            param1.setValue(value1);
+            paramList.add(param1);
+
+            Param param2 = new Param();
+            com.companion.local.request.Value value2 = new com.companion.local.request.Value();
+            value2.setString(request.getReference());
+            param2.setValue(value2);
+            paramList.add(param2);
+
+            Param param3 = new Param();
+            com.companion.local.request.Value value3 = new com.companion.local.request.Value();
+            value3.setString(request.getCardIdentifier());
+            param3.setValue(value3);
+            paramList.add(param3);
+
+            Param param4 = new Param();
+            com.companion.local.request.Value value4 = new com.companion.local.request.Value();
+            value4.setString(request.getReasonID());
+            param4.setValue(value4);
+            paramList.add(param4);
+
+            Param param5 = new Param();
+            com.companion.local.request.Value value5 = new com.companion.local.request.Value();
+            value5.setString(request.getNote());
+            param5.setValue(value5);
+            paramList.add(param5);
+
+
+            Param param6 = new Param();
+            com.companion.local.request.Value value6 = new com.companion.local.request.Value();
+            value6.setString(request.getTransactionId());
+            param6.setValue(value6);
+            paramList.add(param6);
+
+            Param param7 = new Param();
+            com.companion.local.request.Value value7 = new com.companion.local.request.Value();
+            value7.setDateTimeIso8601(request.getTransactionDate());
+            param7.setValue(value7);
+            paramList.add(param7);
+
+            Param param8 = new Param();
+            com.companion.local.request.Value value8 = new com.companion.local.request.Value();
+            value8.setString("");
+            param8.setValue(value8);
+            paramList.add(param8);
+
+            params.setParam(paramList);
+            methodCall.setMethodName("StopCard");
+            methodCall.setParams(params);
+
+            String responseFromCompanionApi = null;
+
+            try {
+                responseFromCompanionApi = restTemplate.postForObject(companionTutukaEndpoint, generateRequestXmlString(methodCall), String.class);
+                DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                InputSource is = new InputSource();
+                is.setCharacterStream(new StringReader(responseFromCompanionApi));
+
+                Document doc = db.parse(is);
+                NodeList nodes = doc.getElementsByTagName("value");
+
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    Element element = (Element) nodes.item(i);
+                    NodeList name = element.getElementsByTagName("string");
+                    response.setResponseStatus(getCharacterDataFromElement((Element) name.item(0)));
+                    break;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.setResponseStatus("FAILED");
+            }
+            responseList.add(response);
+        }
+        return new ResponseEntity(responseList, HttpStatus.OK);
+    }
+
+
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping(value = "/local.printLinkedCard")
+    public ResponseEntity<List<CardResponse>> printLinkedCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody List<PrintLinkedCardRequest> requestList) {
+
+        List<CardResponse> responseList = new ArrayList<CardResponse>();
+        for (PrintLinkedCardRequest request : requestList) {
+            CardResponse response = new CardResponse();
+            response.setCardIdentifier(request.getCardIdentifier());
+            MethodCall methodCall = new MethodCall();
+            Params params = new Params();
+            List<Param> paramList = new ArrayList<>();
+
+            Param param1 = new Param();
+            com.companion.local.request.Value value1 = new com.companion.local.request.Value();
+            value1.setString("0030069501");
+            param1.setValue(value1);
+            paramList.add(param1);
+
+            Param param2 = new Param();
+            com.companion.local.request.Value value2 = new com.companion.local.request.Value();
+            value2.setString(request.getTitle());
+            param2.setValue(value2);
+            paramList.add(param2);
+
+            Param param3 = new Param();
+            com.companion.local.request.Value value3 = new com.companion.local.request.Value();
+            value3.setString(request.getInitials());
+            param3.setValue(value3);
+            paramList.add(param3);
+
+            Param param4 = new Param();
+            com.companion.local.request.Value value4 = new com.companion.local.request.Value();
+            value4.setString(request.getLastName());
+            param4.setValue(value4);
+            paramList.add(param4);
+
+            Param param5 = new Param();
+            com.companion.local.request.Value value5 = new com.companion.local.request.Value();
+            value5.setString(request.getAddress1());
+            param5.setValue(value5);
+            paramList.add(param5);
+
+            Param param6 = new Param();
+            com.companion.local.request.Value value6 = new com.companion.local.request.Value();
+            value6.setString(request.getAddress2());
+            param6.setValue(value6);
+            paramList.add(param6);
+
+            Param param7 = new Param();
+            com.companion.local.request.Value value7 = new com.companion.local.request.Value();
+            value7.setString(request.getAddress3());
+            param7.setValue(value7);
+            paramList.add(param7);
+
+
+            Param param8 = new Param();
+            com.companion.local.request.Value value8 = new com.companion.local.request.Value();
+            value8.setString(request.getAddress4());
+            param8.setValue(value8);
+            paramList.add(param8);
+
+            Param param9 = new Param();
+            com.companion.local.request.Value value9 = new com.companion.local.request.Value();
+            value9.setString(request.getAddress5());
+            param9.setValue(value9);
+            paramList.add(param9);
+
+            Param param10 = new Param();
+            com.companion.local.request.Value value10 = new com.companion.local.request.Value();
+            value10.setString(request.getAdditionalData());
+            param10.setValue(value10);
+            paramList.add(param10);
+
+            Param param11 = new Param();
+            com.companion.local.request.Value value11 = new com.companion.local.request.Value();
+            value11.setString(request.getContactNumber());
+            param11.setValue(value11);
+            paramList.add(param11);
+
+            Param param12 = new Param();
+            com.companion.local.request.Value value12 = new com.companion.local.request.Value();
+            value12.setString(request.getCardIdentifier());
+            param12.setValue(value12);
+            paramList.add(param12);
+
+            Param param13 = new Param();
+            com.companion.local.request.Value value13 = new com.companion.local.request.Value();
+            value13.setString(request.getTransactionId());
+            param13.setValue(value13);
+            paramList.add(param13);
+
+            Param param14 = new Param();
+            com.companion.local.request.Value value14 = new com.companion.local.request.Value();
+            value14.setDateTimeIso8601(request.getTransactionDate());
+            param14.setValue(value14);
+            paramList.add(param14);
+
+            Param param15 = new Param();
+            com.companion.local.request.Value value15 = new com.companion.local.request.Value();
+            value15.setString("");
+            param15.setValue(value15);
+            paramList.add(param15);
+
+            params.setParam(paramList);
+            methodCall.setMethodName("PrintLinkedCard");
+            methodCall.setParams(params);
+
+            String responseFromCompanionApi = null;
+
+            try {
+                responseFromCompanionApi = restTemplate.postForObject(companionTutukaEndpoint, generateRequestXmlString(methodCall), String.class);
+                DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                InputSource is = new InputSource();
+                is.setCharacterStream(new StringReader(responseFromCompanionApi));
+
+                Document doc = db.parse(is);
+                NodeList nodes = doc.getElementsByTagName("value");
+
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    Element element = (Element) nodes.item(i);
+                    NodeList name = element.getElementsByTagName("string");
+                    response.setResponseStatus(getCharacterDataFromElement((Element) name.item(0)));
+                    break;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.setResponseStatus("FAILED");
+            }
+            responseList.add(response);
+        }
+        return new ResponseEntity(responseList, HttpStatus.OK);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping(value = "/local.unstopCard")
+    public ResponseEntity<List<CardResponse>> unstopCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody List<UnstopCardRequest> requestList) {
+
+        List<CardResponse> responseList = new ArrayList<CardResponse>();
+        for (UnstopCardRequest request : requestList) {
+            CardResponse response = new CardResponse();
+            response.setCardIdentifier(request.getCardIdentifier());
+            MethodCall methodCall = new MethodCall();
+            Params params = new Params();
+            List<Param> paramList = new ArrayList<>();
+
+            Param param1 = new Param();
+            com.companion.local.request.Value value1 = new com.companion.local.request.Value();
+            value1.setString("0030069501");
+            param1.setValue(value1);
+            paramList.add(param1);
+
+            Param param2 = new Param();
+            com.companion.local.request.Value value2 = new com.companion.local.request.Value();
+            value2.setString(request.getReference());
+            param2.setValue(value2);
+            paramList.add(param2);
+
+            Param param3 = new Param();
+            com.companion.local.request.Value value3 = new com.companion.local.request.Value();
+            value3.setString(request.getCardIdentifier());
+            param3.setValue(value3);
+            paramList.add(param3);
+
+            Param param4 = new Param();
+            com.companion.local.request.Value value4 = new com.companion.local.request.Value();
+            value4.setString(request.getNote());
+            param4.setValue(value4);
+            paramList.add(param4);
+
+            Param param5 = new Param();
+            com.companion.local.request.Value value5 = new com.companion.local.request.Value();
+            value5.setString(request.getTransactionId());
+            param5.setValue(value5);
+            paramList.add(param5);
+
+            Param param6 = new Param();
+            com.companion.local.request.Value value6 = new com.companion.local.request.Value();
+            value6.setDateTimeIso8601(request.getTransactionDate());
+            param6.setValue(value6);
+            paramList.add(param6);
+
+            Param param7 = new Param();
+            com.companion.local.request.Value value7 = new com.companion.local.request.Value();
+            value7.setString("");
+            param7.setValue(value7);
+            paramList.add(param7);
+
+
+            params.setParam(paramList);
+            methodCall.setMethodName("UnstopCard");
+            methodCall.setParams(params);
+
+            String responseFromCompanionApi = null;
+
+            try {
+                responseFromCompanionApi = restTemplate.postForObject(companionTutukaEndpoint, generateRequestXmlString(methodCall), String.class);
+                DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                InputSource is = new InputSource();
+                is.setCharacterStream(new StringReader(responseFromCompanionApi));
+
+                Document doc = db.parse(is);
+                NodeList nodes = doc.getElementsByTagName("value");
+
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    Element element = (Element) nodes.item(i);
+                    NodeList name = element.getElementsByTagName("string");
+                    response.setResponseStatus(getCharacterDataFromElement((Element) name.item(0)));
+                    break;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.setResponseStatus("FAILED");
+            }
+            responseList.add(response);
+        }
+        return new ResponseEntity(responseList, HttpStatus.OK);
     }
 
     /**

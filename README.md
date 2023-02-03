@@ -21,26 +21,45 @@ and responds with the similar response as companion api
 
 sample request
 ------------------
+[
 {
-"methodName": "CreateLinkedCard",
 "reference": "1372123433",
-"firstName": "Ali",
-"lastName": "Khan",
+"firstName": "Saleem",
+"lastName": "Fenku",
 "idOrPassport": "Z765765I76576",
 "cellphoneNumber":"20401010T10:10:10",
 "expiryDate": "20401010T10:10:10",
 "transactionId": "6beebbae-98c2-4d74-97a8-a070645f4147",
 "transactionDate": "20221216T10:10:10"
+},
+{
+"reference": "1372123433",
+"firstName": "Sultan",
+"lastName": "Mirza",
+"idOrPassport": "Z65465465",
+"cellphoneNumber":"20401010T10:10:10",
+"expiryDate": "20401010T10:10:10",
+"transactionId": "6beebbae-98c2-4d74-97a8-a070645f4147",
+"transactionDate": "20221216T10:10:10"
 }
+]
 
 sample response
 ------------------
+[
 {
-"cardNumber": "5371******467777",
+"cardNumber": "5371642830742127",
 "expiryDate": "10/40",
-"cvv": "182",
-"trackingNumber": "662715500000033"
+"cvv": "107",
+"trackingNumber": "747515500000042"
+},
+{
+"cardNumber": "5371641925235773",
+"expiryDate": "10/40",
+"cvv": "474",
+"trackingNumber": "742015500000043"
 }
+]
 
 To make it easy for you to get started with GitLab, here's a list of recommended next steps.
 
