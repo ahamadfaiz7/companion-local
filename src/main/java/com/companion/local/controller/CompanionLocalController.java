@@ -12,6 +12,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.namedparam.NamedParameterUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -23,12 +24,16 @@ import org.xml.sax.InputSource;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,6 +42,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class CompanionLocalController {
 
+    public static final String TERMINAL_ID = "0030069501";
+    public static final String VALUE = "value";
+    public static final String STRING = "string";
+    public static final String FAILED = "FAILED";
+    public static final String SUCCESS = "SUCCESS";
     @Value("${companion.tutuka.uat.endpoint}")
     private String companionTutukaEndpoint;
     @Value("${companion.tutuka.uat.terminal.key}")
@@ -62,7 +72,7 @@ public class CompanionLocalController {
 
             Param param1 = new Param();
             com.companion.local.request.Value value1 = new com.companion.local.request.Value();
-            value1.setString("0030069501");
+            value1.setString(TERMINAL_ID);
             param1.setValue(value1);
             paramList.add(param1);
 
@@ -133,21 +143,21 @@ public class CompanionLocalController {
                 is.setCharacterStream(new StringReader(responseFromCompanionApi));
 
                 Document doc = db.parse(is);
-                NodeList nodes = doc.getElementsByTagName("value");
+                NodeList nodes = doc.getElementsByTagName(VALUE);
 
                 for (int i = 0; i < nodes.getLength(); i++) {
                     Element element = (Element) nodes.item(i);
-                    NodeList name = element.getElementsByTagName("string");
+                    NodeList name = element.getElementsByTagName(STRING);
                     response.setCvv(getCharacterDataFromElement((Element) name.item(0)));
                     response.setCardNumber(getCharacterDataFromElement((Element) name.item(1)));
                     response.setExpiryDate(getCharacterDataFromElement((Element) name.item(3)));
                     response.setTrackingNumber(getCharacterDataFromElement((Element) name.item(4)));
                     break;
                 }
-                response.setResponseStatus("SUCCESS");
+                response.setResponseStatus(SUCCESS);
             } catch (Exception e) {
                 e.printStackTrace();
-                response.setResponseStatus("FAILED");
+                response.setResponseStatus(FAILED);
             }
             responseList.add(response);
         }
@@ -168,7 +178,7 @@ public class CompanionLocalController {
 
             Param param1 = new Param();
             com.companion.local.request.Value value1 = new com.companion.local.request.Value();
-            value1.setString("0030069501");
+            value1.setString(TERMINAL_ID);
             param1.setValue(value1);
             paramList.add(param1);
 
@@ -210,17 +220,17 @@ public class CompanionLocalController {
                 is.setCharacterStream(new StringReader(responseFromCompanionApi));
 
                 Document doc = db.parse(is);
-                NodeList nodes = doc.getElementsByTagName("value");
+                NodeList nodes = doc.getElementsByTagName(VALUE);
 
                 for (int i = 0; i < nodes.getLength(); i++) {
                     Element element = (Element) nodes.item(i);
-                    NodeList name = element.getElementsByTagName("string");
+                    NodeList name = element.getElementsByTagName(STRING);
                     response.setResponseStatus(getCharacterDataFromElement((Element) name.item(0)));
                     break;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                response.setResponseStatus("FAILED");
+                response.setResponseStatus(FAILED);
             }
             responseList.add(response);
         }
@@ -241,7 +251,7 @@ public class CompanionLocalController {
 
             Param param1 = new Param();
             com.companion.local.request.Value value1 = new com.companion.local.request.Value();
-            value1.setString("0030069501");
+            value1.setString(TERMINAL_ID);
             param1.setValue(value1);
             paramList.add(param1);
 
@@ -295,17 +305,17 @@ public class CompanionLocalController {
                 is.setCharacterStream(new StringReader(responseFromCompanionApi));
 
                 Document doc = db.parse(is);
-                NodeList nodes = doc.getElementsByTagName("value");
+                NodeList nodes = doc.getElementsByTagName(VALUE);
 
                 for (int i = 0; i < nodes.getLength(); i++) {
                     Element element = (Element) nodes.item(i);
-                    NodeList name = element.getElementsByTagName("string");
+                    NodeList name = element.getElementsByTagName(STRING);
                     response.setResponseStatus(getCharacterDataFromElement((Element) name.item(0)));
                     break;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                response.setResponseStatus("FAILED");
+                response.setResponseStatus(FAILED);
             }
             responseList.add(response);
         }
@@ -322,7 +332,7 @@ public class CompanionLocalController {
 
         Param param1 = new Param();
         com.companion.local.request.Value value1 = new com.companion.local.request.Value();
-        value1.setString("0030069501");
+        value1.setString(TERMINAL_ID);
         param1.setValue(value1);
         paramList.add(param1);
 
@@ -359,7 +369,7 @@ public class CompanionLocalController {
 
         try {
             responseFromCompanionApi = restTemplate.postForObject(companionTutukaEndpoint, generateRequestXmlString(methodCall), String.class);
-            String dataString = responseFromCompanionApi.substring(responseFromCompanionApi.indexOf("<array>") + 7, responseFromCompanionApi.indexOf("</array>"));
+            String dataString = responseFromCompanionApi != null ? responseFromCompanionApi.substring(responseFromCompanionApi.indexOf("<array>") + 7, responseFromCompanionApi.indexOf("</array>")) : null;
 
             JAXBContext marshal = JAXBContext.newInstance(Data.class);
             Unmarshaller unmarshaller = marshal.createUnmarshaller();
@@ -377,7 +387,12 @@ public class CompanionLocalController {
                 responseList.add(response);
             }
 
-        } catch (Exception e) {
+        }
+        catch (NullPointerException e) {
+            e.printStackTrace();
+            return new ResponseEntity(responseList, HttpStatus.BAD_REQUEST);
+        }
+        catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity(responseList, HttpStatus.BAD_REQUEST);
         }
@@ -399,7 +414,7 @@ public class CompanionLocalController {
 
             Param param1 = new Param();
             com.companion.local.request.Value value1 = new com.companion.local.request.Value();
-            value1.setString("0030069501");
+            value1.setString(TERMINAL_ID);
             param1.setValue(value1);
             paramList.add(param1);
 
@@ -447,17 +462,17 @@ public class CompanionLocalController {
                 is.setCharacterStream(new StringReader(responseFromCompanionApi));
 
                 Document doc = db.parse(is);
-                NodeList nodes = doc.getElementsByTagName("value");
+                NodeList nodes = doc.getElementsByTagName(VALUE);
 
                 for (int i = 0; i < nodes.getLength(); i++) {
                     Element element = (Element) nodes.item(i);
-                    NodeList name = element.getElementsByTagName("string");
+                    NodeList name = element.getElementsByTagName(STRING);
                     response.setResponseStatus(getCharacterDataFromElement((Element) name.item(0)));
                     break;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                response.setResponseStatus("FAILED");
+                response.setResponseStatus(FAILED);
             }
             responseList.add(response);
         }
@@ -478,7 +493,7 @@ public class CompanionLocalController {
 
             Param param1 = new Param();
             com.companion.local.request.Value value1 = new com.companion.local.request.Value();
-            value1.setString("0030069501");
+            value1.setString(TERMINAL_ID);
             param1.setValue(value1);
             paramList.add(param1);
 
@@ -549,17 +564,17 @@ public class CompanionLocalController {
                 is.setCharacterStream(new StringReader(responseFromCompanionApi));
 
                 Document doc = db.parse(is);
-                NodeList nodes = doc.getElementsByTagName("value");
+                NodeList nodes = doc.getElementsByTagName(VALUE);
 
                 for (int i = 0; i < nodes.getLength(); i++) {
                     Element element = (Element) nodes.item(i);
-                    NodeList name = element.getElementsByTagName("string");
+                    NodeList name = element.getElementsByTagName(STRING);
                     response.setResponseStatus(getCharacterDataFromElement((Element) name.item(0)));
                     break;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                response.setResponseStatus("FAILED");
+                response.setResponseStatus(FAILED);
             }
             responseList.add(response);
         }
@@ -580,7 +595,7 @@ public class CompanionLocalController {
 
             Param param1 = new Param();
             com.companion.local.request.Value value1 = new com.companion.local.request.Value();
-            value1.setString("0030069501");
+            value1.setString(TERMINAL_ID);
             param1.setValue(value1);
             paramList.add(param1);
 
@@ -640,17 +655,17 @@ public class CompanionLocalController {
                 is.setCharacterStream(new StringReader(responseFromCompanionApi));
 
                 Document doc = db.parse(is);
-                NodeList nodes = doc.getElementsByTagName("value");
+                NodeList nodes = doc.getElementsByTagName(VALUE);
 
                 for (int i = 0; i < nodes.getLength(); i++) {
                     Element element = (Element) nodes.item(i);
-                    NodeList name = element.getElementsByTagName("string");
+                    NodeList name = element.getElementsByTagName(STRING);
                     response.setResponseStatus(getCharacterDataFromElement((Element) name.item(0)));
                     break;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                response.setResponseStatus("FAILED");
+                response.setResponseStatus(FAILED);
             }
             responseList.add(response);
         }
@@ -672,7 +687,7 @@ public class CompanionLocalController {
 
             Param param1 = new Param();
             com.companion.local.request.Value value1 = new com.companion.local.request.Value();
-            value1.setString("0030069501");
+            value1.setString(TERMINAL_ID);
             param1.setValue(value1);
             paramList.add(param1);
 
@@ -774,17 +789,17 @@ public class CompanionLocalController {
                 is.setCharacterStream(new StringReader(responseFromCompanionApi));
 
                 Document doc = db.parse(is);
-                NodeList nodes = doc.getElementsByTagName("value");
+                NodeList nodes = doc.getElementsByTagName(VALUE);
 
                 for (int i = 0; i < nodes.getLength(); i++) {
                     Element element = (Element) nodes.item(i);
-                    NodeList name = element.getElementsByTagName("string");
+                    NodeList name = element.getElementsByTagName(STRING);
                     response.setResponseStatus(getCharacterDataFromElement((Element) name.item(0)));
                     break;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                response.setResponseStatus("FAILED");
+                response.setResponseStatus(FAILED);
             }
             responseList.add(response);
         }
@@ -805,7 +820,7 @@ public class CompanionLocalController {
 
             Param param1 = new Param();
             com.companion.local.request.Value value1 = new com.companion.local.request.Value();
-            value1.setString("0030069501");
+            value1.setString(TERMINAL_ID);
             param1.setValue(value1);
             paramList.add(param1);
 
@@ -859,17 +874,108 @@ public class CompanionLocalController {
                 is.setCharacterStream(new StringReader(responseFromCompanionApi));
 
                 Document doc = db.parse(is);
-                NodeList nodes = doc.getElementsByTagName("value");
+                NodeList nodes = doc.getElementsByTagName(VALUE);
 
                 for (int i = 0; i < nodes.getLength(); i++) {
                     Element element = (Element) nodes.item(i);
-                    NodeList name = element.getElementsByTagName("string");
+                    NodeList name = element.getElementsByTagName(STRING);
                     response.setResponseStatus(getCharacterDataFromElement((Element) name.item(0)));
                     break;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                response.setResponseStatus("FAILED");
+                response.setResponseStatus(FAILED);
+            }
+            responseList.add(response);
+        }
+        return new ResponseEntity(responseList, HttpStatus.OK);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping(value = "/local.toggleVoucherFeature")
+    public ResponseEntity<List<CardResponse>> toggleVoucherFeature(@RequestHeader MultiValueMap<String, String> headers, @RequestBody List<ToggleVoucherFeatureRequest> requestList) {
+
+        List<CardResponse> responseList = new ArrayList<CardResponse>();
+        for (ToggleVoucherFeatureRequest request : requestList) {
+            CardResponse response = new CardResponse();
+            response.setCardIdentifier(request.getCardIdentifier());
+            MethodCall methodCall = new MethodCall();
+            Params params = new Params();
+            List<Param> paramList = new ArrayList<>();
+
+            Param param1 = new Param();
+            com.companion.local.request.Value value1 = new com.companion.local.request.Value();
+            value1.setString(TERMINAL_ID);
+            param1.setValue(value1);
+            paramList.add(param1);
+
+            Param param2 = new Param();
+            com.companion.local.request.Value value2 = new com.companion.local.request.Value();
+            value2.setString(request.getReference());
+            param2.setValue(value2);
+            paramList.add(param2);
+
+            Param param3 = new Param();
+            com.companion.local.request.Value value3 = new com.companion.local.request.Value();
+            value3.setString(request.getCardIdentifier());
+            param3.setValue(value3);
+            paramList.add(param3);
+
+            Param param4 = new Param();
+            com.companion.local.request.Value value4 = new com.companion.local.request.Value();
+            value4.setString(request.getFeatureName());
+            param4.setValue(value4);
+            paramList.add(param4);
+
+            Param param5 = new Param();
+            com.companion.local.request.Value value5 = new com.companion.local.request.Value();
+            value5.set_boolean(request.getFeatureStatus());
+            param5.setValue(value5);
+            paramList.add(param5);
+
+
+            Param param6 = new Param();
+            com.companion.local.request.Value value6 = new com.companion.local.request.Value();
+            value6.setString(request.getTransactionId());
+            param6.setValue(value6);
+            paramList.add(param6);
+
+            Param param7 = new Param();
+            com.companion.local.request.Value value7 = new com.companion.local.request.Value();
+            value7.setDateTimeIso8601(request.getTransactionDate());
+            param7.setValue(value7);
+            paramList.add(param7);
+
+            Param param8 = new Param();
+            com.companion.local.request.Value value8 = new com.companion.local.request.Value();
+            value8.setString("");
+            param8.setValue(value8);
+            paramList.add(param8);
+
+            params.setParam(paramList);
+            methodCall.setMethodName("ToggleVoucherFeature");
+            methodCall.setParams(params);
+
+            String responseFromCompanionApi = null;
+
+            try {
+                responseFromCompanionApi = restTemplate.postForObject(companionTutukaEndpoint, generateRequestXmlString(methodCall), String.class);
+                DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                InputSource is = new InputSource();
+                is.setCharacterStream(new StringReader(responseFromCompanionApi));
+
+                Document doc = db.parse(is);
+                NodeList nodes = doc.getElementsByTagName(VALUE);
+
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    Element element = (Element) nodes.item(i);
+                    NodeList name = element.getElementsByTagName(STRING);
+                    response.setResponseStatus(getCharacterDataFromElement((Element) name.item(0)));
+                    break;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.setResponseStatus(FAILED);
             }
             responseList.add(response);
         }
@@ -883,13 +989,13 @@ public class CompanionLocalController {
      * @return
      * @throws Exception
      */
-    private String generateRequestXmlString(@RequestBody MethodCall request) throws Exception {
+    private String generateRequestXmlString(@RequestBody MethodCall request) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException, JAXBException {
         List<com.companion.local.request.Value> valueList = request.getParams().getParam().stream().map(s -> s.getValue()).collect(Collectors.toList());
         String requestData = request.getMethodName();
         int count = 0;
         for (com.companion.local.request.Value val : valueList) {
-            requestData = requestData.concat(val.getString() != null ? val.getString() : val.getDateTimeIso8601());
-            count = ++count;
+            requestData = requestData.concat(val.getString() != null ? val.getString() : val.getDateTimeIso8601() != null ? val.getDateTimeIso8601() : val.get_boolean());
+            ++count;
             if (count == valueList.size() - 1)
                 break;
         }
@@ -902,6 +1008,7 @@ public class CompanionLocalController {
         marshallerObj.marshal(request, sw);
         String req = sw.toString();
         req = req.replace("dateTimeIso8601", "dateTime.iso8601");
+        req = req.replace("_boolean", "boolean");
         return req;
     }
 
@@ -913,7 +1020,7 @@ public class CompanionLocalController {
      * @return
      * @throws Exception
      */
-    private static String encode(String key, String data) throws Exception {
+    private static String encode(String key, String data) throws NoSuchAlgorithmException, UnsupportedEncodingException, InvalidKeyException {
         Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
         SecretKeySpec secret_key = new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA256");
         sha256_HMAC.init(secret_key);
