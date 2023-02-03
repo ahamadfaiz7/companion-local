@@ -1,5 +1,10 @@
 # CompanionLocal
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=paymento_42040066&metric=alert_status&token=1a55daf3ae9ed2d32bff1de51069802740eea191)](https://sonarcloud.io/summary/new_code?id=paymento_42040066)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=paymento_42040066&metric=code_smells&token=1a55daf3ae9ed2d32bff1de51069802740eea191)](https://sonarcloud.io/summary/new_code?id=paymento_42040066)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=paymento_42040066&metric=bugs&token=1a55daf3ae9ed2d32bff1de51069802740eea191)](https://sonarcloud.io/summary/new_code?id=paymento_42040066)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=paymento_42040066&metric=vulnerabilities&token=1a55daf3ae9ed2d32bff1de51069802740eea191)](https://sonarcloud.io/summary/new_code?id=paymento_42040066)
+
 Repository that is used for companion-local
 
 ## Getting started
