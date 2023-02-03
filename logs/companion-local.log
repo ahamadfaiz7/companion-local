@@ -1,0 +1,64 @@
+2023-02-03 08:11:26.219  WARN 2111 --- [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=9h2m2s856ms).
+2023-02-03 08:12:57.288  WARN 2111 --- [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Retrograde clock change detected (housekeeper delta=29s683ms), soft-evicting connections from pool.
+2023-02-03 08:24:00.527  WARN 2111 --- [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=8m3s201ms).
+2023-02-03 08:27:39.823  INFO 2111 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-02-03 08:27:39.831  INFO 2111 --- [SpringApplicationShutdownHook] .SchemaDropperImpl$DelayedDropActionImpl : HHH000477: Starting delayed evictData of schema as part of SessionFactory shut-down'
+2023-02-03 08:27:39.935  INFO 2111 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2023-02-03 08:27:39.954  INFO 2111 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2023-02-03 08:27:52.435  INFO 7413 --- [main] c.c.local.CompanionLocalApplication      : Starting CompanionLocalApplication using Java 17.0.2 on Mohammads-MacBook-Pro.local with PID 7413 (/Users/mohammadahamad/dev/companion-local/build/classes/java/main started by mohammadahamad in /Users/mohammadahamad/dev/companion-local)
+2023-02-03 08:27:52.438  INFO 7413 --- [main] c.c.local.CompanionLocalApplication      : No active profile set, falling back to 1 default profile: "default"
+2023-02-03 08:27:53.150  INFO 7413 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-02-03 08:27:53.169  INFO 7413 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 9 ms. Found 0 JPA repository interfaces.
+2023-02-03 08:27:53.796  INFO 7413 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 5004 (http)
+2023-02-03 08:27:53.809  INFO 7413 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2023-02-03 08:27:53.809  INFO 7413 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.68]
+2023-02-03 08:27:53.933  INFO 7413 --- [main] o.a.c.c.C.[.[.[/companion-local]         : Initializing Spring embedded WebApplicationContext
+2023-02-03 08:27:53.934  INFO 7413 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1438 ms
+2023-02-03 08:27:54.102  INFO 7413 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2023-02-03 08:27:54.315  INFO 7413 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2023-02-03 08:27:54.383  INFO 7413 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2023-02-03 08:27:54.439  INFO 7413 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.12.Final
+2023-02-03 08:27:54.621  INFO 7413 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2023-02-03 08:27:54.756  INFO 7413 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
+2023-02-03 08:27:54.936  INFO 7413 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2023-02-03 08:27:54.946  INFO 7413 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-02-03 08:27:54.977  WARN 7413 --- [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-02-03 08:27:55.349  INFO 7413 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 5004 (http) with context path '/companion-local'
+2023-02-03 08:27:55.358  INFO 7413 --- [main] c.c.local.CompanionLocalApplication      : Started CompanionLocalApplication in 8.414 seconds (JVM running for 9.4)
+2023-02-03 08:28:29.160  INFO 7413 --- [http-nio-5004-exec-1] o.a.c.c.C.[.[.[/companion-local]         : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-02-03 08:28:29.160  INFO 7413 --- [http-nio-5004-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2023-02-03 08:28:29.162  INFO 7413 --- [http-nio-5004-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2023-02-03 08:28:49.333  INFO 7413 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-02-03 08:28:49.333  INFO 7413 --- [SpringApplicationShutdownHook] .SchemaDropperImpl$DelayedDropActionImpl : HHH000477: Starting delayed evictData of schema as part of SessionFactory shut-down'
+2023-02-03 08:28:49.337  INFO 7413 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2023-02-03 08:28:49.339  INFO 7413 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2023-02-03 08:29:15.807  INFO 7485 --- [main] c.c.local.CompanionLocalApplication      : Starting CompanionLocalApplication using Java 17.0.2 on Mohammads-MacBook-Pro.local with PID 7485 (/Users/mohammadahamad/dev/companion-local/build/classes/java/main started by mohammadahamad in /Users/mohammadahamad/dev/companion-local)
+2023-02-03 08:29:15.811  INFO 7485 --- [main] c.c.local.CompanionLocalApplication      : No active profile set, falling back to 1 default profile: "default"
+2023-02-03 08:29:16.739  INFO 7485 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-02-03 08:29:16.766  INFO 7485 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 12 ms. Found 0 JPA repository interfaces.
+2023-02-03 08:29:17.515  INFO 7485 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 5004 (http)
+2023-02-03 08:29:17.530  INFO 7485 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2023-02-03 08:29:17.531  INFO 7485 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.68]
+2023-02-03 08:29:17.678  INFO 7485 --- [main] o.a.c.c.C.[.[.[/companion-local]         : Initializing Spring embedded WebApplicationContext
+2023-02-03 08:29:17.679  INFO 7485 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1782 ms
+2023-02-03 08:29:17.886  INFO 7485 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2023-02-03 08:29:18.142  INFO 7485 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2023-02-03 08:29:18.213  INFO 7485 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2023-02-03 08:29:18.269  INFO 7485 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.12.Final
+2023-02-03 08:29:18.474  INFO 7485 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2023-02-03 08:29:18.600  INFO 7485 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
+2023-02-03 08:29:18.801  INFO 7485 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2023-02-03 08:29:18.810  INFO 7485 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-02-03 08:29:18.848  WARN 7485 --- [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-02-03 08:29:19.261  INFO 7485 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 5004 (http) with context path '/companion-local'
+2023-02-03 08:29:19.272  INFO 7485 --- [main] c.c.local.CompanionLocalApplication      : Started CompanionLocalApplication in 8.944 seconds (JVM running for 9.472)
+2023-02-03 08:29:59.018  INFO 7485 --- [http-nio-5004-exec-1] o.a.c.c.C.[.[.[/companion-local]         : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-02-03 08:29:59.019  INFO 7485 --- [http-nio-5004-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2023-02-03 08:29:59.020  INFO 7485 --- [http-nio-5004-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2023-02-03 08:31:01.756  WARN 7485 --- [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m13s514ms).
+2023-02-03 09:23:03.984  WARN 7485 --- [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=26m31s982ms).
+2023-02-03 10:25:29.885  WARN 7485 --- [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=10m55s500ms).
+2023-02-03 10:50:43.856  WARN 7485 --- [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=19m12s433ms).
+2023-02-03 12:41:24.944  WARN 7485 --- [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=7m8s531ms).
+2023-02-03 13:23:04.823  WARN 7485 --- [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=40m8s421ms).
+2023-02-03 13:56:10.122  WARN 7485 --- [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=32m35s275ms).
