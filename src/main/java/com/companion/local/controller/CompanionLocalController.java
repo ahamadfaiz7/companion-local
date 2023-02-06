@@ -36,7 +36,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/api")
@@ -61,6 +60,106 @@ public class CompanionLocalController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(value = "/local.createLinkedCard")
+    public ResponseEntity<java.io.Serializable> createCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody CreateLinkedCardRequest request) {
+        CreateLinkedCardResponse response = new CreateLinkedCardResponse();
+        MethodCall methodCall = new MethodCall();
+        Params params = new Params();
+        List<Param> paramList = new ArrayList<>();
+
+        Param param1 = new Param();
+        com.companion.local.request.Value value1 = new com.companion.local.request.Value();
+        value1.setString(TERMINAL_ID);
+        param1.setValue(value1);
+        paramList.add(param1);
+
+        Param param2 = new Param();
+        com.companion.local.request.Value value2 = new com.companion.local.request.Value();
+        value2.setString(request.getReference());
+        param2.setValue(value2);
+        paramList.add(param2);
+
+        Param param3 = new Param();
+        com.companion.local.request.Value value3 = new com.companion.local.request.Value();
+        value3.setString(request.getFirstName());
+        param3.setValue(value3);
+        paramList.add(param3);
+
+        Param param4 = new Param();
+        com.companion.local.request.Value value4 = new com.companion.local.request.Value();
+        value4.setString(request.getLastName());
+        param4.setValue(value4);
+        paramList.add(param4);
+
+        Param param5 = new Param();
+        com.companion.local.request.Value value5 = new com.companion.local.request.Value();
+        value5.setString(request.getIdOrPassport());
+        param5.setValue(value5);
+        paramList.add(param5);
+
+        Param param6 = new Param();
+        com.companion.local.request.Value value6 = new com.companion.local.request.Value();
+        value6.setString(request.getCellphoneNumber());
+        param6.setValue(value6);
+        paramList.add(param6);
+
+        Param param7 = new Param();
+        com.companion.local.request.Value value7 = new com.companion.local.request.Value();
+        value7.setDateTimeIso8601(request.getExpiryDate());
+        param7.setValue(value7);
+        paramList.add(param7);
+
+        Param param8 = new Param();
+        com.companion.local.request.Value value8 = new com.companion.local.request.Value();
+        value8.setString(request.getTransactionId());
+        param8.setValue(value8);
+        paramList.add(param8);
+
+        Param param9 = new Param();
+        com.companion.local.request.Value value9 = new com.companion.local.request.Value();
+        value9.setDateTimeIso8601(request.getTransactionDate());
+        param9.setValue(value9);
+        paramList.add(param9);
+
+        Param param10 = new Param();
+        com.companion.local.request.Value value10 = new com.companion.local.request.Value();
+        value10.setString("");
+        param10.setValue(value10);
+        paramList.add(param10);
+
+        params.setParam(paramList);
+        methodCall.setMethodName("CreateLinkedCard");
+        methodCall.setParams(params);
+
+        String responseFromCompanionApi = null;
+
+        try {
+            responseFromCompanionApi = restTemplate.postForObject(companionTutukaEndpoint, generateRequestXmlString(methodCall), String.class);
+            DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            InputSource is = new InputSource();
+            is.setCharacterStream(new StringReader(responseFromCompanionApi));
+
+            Document doc = db.parse(is);
+            NodeList nodes = doc.getElementsByTagName(VALUE);
+
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Element element = (Element) nodes.item(i);
+                NodeList name = element.getElementsByTagName(STRING);
+                response.setCvv(getCharacterDataFromElement((Element) name.item(0)));
+                response.setCardNumber(getCharacterDataFromElement((Element) name.item(1)));
+                response.setExpiryDate(getCharacterDataFromElement((Element) name.item(3)));
+                response.setTrackingNumber(getCharacterDataFromElement((Element) name.item(4)));
+                break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<java.io.Serializable>(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<java.io.Serializable>(response, HttpStatus.OK);
+
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping(value = "/local.createLinkedCardList")
     public ResponseEntity<List<CreateLinkedCardResponse>> createCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody List<CreateLinkedCardRequest> requestList) {
 
         List<CreateLinkedCardResponse> responseList = new ArrayList<CreateLinkedCardResponse>();
@@ -161,7 +260,7 @@ public class CompanionLocalController {
             }
             responseList.add(response);
         }
-        return new ResponseEntity(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -234,7 +333,7 @@ public class CompanionLocalController {
             }
             responseList.add(response);
         }
-        return new ResponseEntity(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -319,7 +418,7 @@ public class CompanionLocalController {
             }
             responseList.add(response);
         }
-        return new ResponseEntity(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -388,16 +487,12 @@ public class CompanionLocalController {
             }
 
         }
-        catch (NullPointerException e) {
-            e.printStackTrace();
-            return new ResponseEntity(responseList, HttpStatus.BAD_REQUEST);
-        }
         catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity(responseList, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(responseList, HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -476,7 +571,7 @@ public class CompanionLocalController {
             }
             responseList.add(response);
         }
-        return new ResponseEntity(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -578,7 +673,7 @@ public class CompanionLocalController {
             }
             responseList.add(response);
         }
-        return new ResponseEntity(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -669,7 +764,7 @@ public class CompanionLocalController {
             }
             responseList.add(response);
         }
-        return new ResponseEntity(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
 
@@ -803,7 +898,7 @@ public class CompanionLocalController {
             }
             responseList.add(response);
         }
-        return new ResponseEntity(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -888,7 +983,7 @@ public class CompanionLocalController {
             }
             responseList.add(response);
         }
-        return new ResponseEntity(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -979,7 +1074,7 @@ public class CompanionLocalController {
             }
             responseList.add(response);
         }
-        return new ResponseEntity(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
     /**
@@ -990,7 +1085,7 @@ public class CompanionLocalController {
      * @throws Exception
      */
     private String generateRequestXmlString(@RequestBody MethodCall request) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException, JAXBException {
-        List<com.companion.local.request.Value> valueList = request.getParams().getParam().stream().map(s -> s.getValue()).collect(Collectors.toList());
+        List<com.companion.local.request.Value> valueList = request.getParams().getParam().stream().map(s -> s.getValue()).toList();
         String requestData = request.getMethodName();
         int count = 0;
         for (com.companion.local.request.Value val : valueList) {
