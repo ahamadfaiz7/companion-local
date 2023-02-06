@@ -59,7 +59,7 @@ public class CompanionLocalController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(value = "/local.createLinkedCard")
-    public ResponseEntity<CreateLinkedCardResponse> createCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody CreateLinkedCardRequest request) {
+    public ResponseEntity<java.io.Serializable> createCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody CreateLinkedCardRequest request) {
         CreateLinkedCardResponse response = new CreateLinkedCardResponse();
         MethodCall methodCall = new MethodCall();
         Params params = new Params();
@@ -138,11 +138,11 @@ public class CompanionLocalController {
             is.setCharacterStream(new StringReader(responseFromCompanionApi));
 
             Document doc = db.parse(is);
-            NodeList nodes = doc.getElementsByTagName("value");
+            NodeList nodes = doc.getElementsByTagName(VALUE);
 
             for (int i = 0; i < nodes.getLength(); i++) {
                 Element element = (Element) nodes.item(i);
-                NodeList name = element.getElementsByTagName("string");
+                NodeList name = element.getElementsByTagName(STRING);
                 response.setCvv(getCharacterDataFromElement((Element) name.item(0)));
                 response.setCardNumber(getCharacterDataFromElement((Element) name.item(1)));
                 response.setExpiryDate(getCharacterDataFromElement((Element) name.item(3)));
@@ -151,15 +151,15 @@ public class CompanionLocalController {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<java.io.Serializable>(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity(response, HttpStatus.OK);
+        return new ResponseEntity<java.io.Serializable>(response, HttpStatus.OK);
 
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(value = "/local.createLinkedCardList")
-    public ResponseEntity createCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody List<CreateLinkedCardRequest> requestList) {
+    public ResponseEntity<List<CreateLinkedCardResponse>> createCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody List<CreateLinkedCardRequest> requestList) {
 
         List<CreateLinkedCardResponse> responseList = new ArrayList<CreateLinkedCardResponse>();
         for (CreateLinkedCardRequest request : requestList) {
@@ -259,7 +259,7 @@ public class CompanionLocalController {
             }
             responseList.add(response);
         }
-        return new ResponseEntity(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -332,7 +332,7 @@ public class CompanionLocalController {
             }
             responseList.add(response);
         }
-        return new ResponseEntity(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -417,7 +417,7 @@ public class CompanionLocalController {
             }
             responseList.add(response);
         }
-        return new ResponseEntity(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -488,10 +488,10 @@ public class CompanionLocalController {
         }
         catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity(responseList, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(responseList, HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -570,7 +570,7 @@ public class CompanionLocalController {
             }
             responseList.add(response);
         }
-        return new ResponseEntity(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -672,7 +672,7 @@ public class CompanionLocalController {
             }
             responseList.add(response);
         }
-        return new ResponseEntity(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -763,7 +763,7 @@ public class CompanionLocalController {
             }
             responseList.add(response);
         }
-        return new ResponseEntity(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
 
@@ -897,7 +897,7 @@ public class CompanionLocalController {
             }
             responseList.add(response);
         }
-        return new ResponseEntity(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -982,7 +982,7 @@ public class CompanionLocalController {
             }
             responseList.add(response);
         }
-        return new ResponseEntity(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -1073,7 +1073,7 @@ public class CompanionLocalController {
             }
             responseList.add(response);
         }
-        return new ResponseEntity(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
     /**
