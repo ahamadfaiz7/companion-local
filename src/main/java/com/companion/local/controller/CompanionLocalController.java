@@ -46,6 +46,7 @@ public class CompanionLocalController {
     public static final String STRING = "string";
     public static final String FAILED = "FAILED";
     public static final String SUCCESS = "SUCCESS";
+    public static final String FAILED_RESPONSE = "Failed Response";
     @Value("${companion.tutuka.uat.endpoint}")
     private String companionTutukaEndpoint;
     @Value("${companion.tutuka.uat.terminal.key}")
@@ -253,10 +254,12 @@ public class CompanionLocalController {
                     response.setTrackingNumber(getCharacterDataFromElement((Element) name.item(4)));
                     break;
                 }
-                response.setResponseStatus(SUCCESS);
             } catch (Exception e) {
                 e.printStackTrace();
-                response.setResponseStatus(FAILED);
+                response.setCvv(FAILED_RESPONSE);
+                response.setCardNumber(FAILED_RESPONSE);
+                response.setExpiryDate(FAILED_RESPONSE);
+                response.setTrackingNumber(FAILED_RESPONSE);
             }
             responseList.add(response);
         }
@@ -482,7 +485,6 @@ public class CompanionLocalController {
                 response.setCardNumber(value.getStruct().getMember().get(1).getValue().getString());
                 response.setExpiryDate(value.getStruct().getMember().get(2).getValue().getString());
                 response.setTrackingNumber(value.getStruct().getMember().get(4).getValue().getString());
-                response.setResponseStatus("Approved");
                 responseList.add(response);
             }
 
