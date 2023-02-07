@@ -10,6 +10,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -771,10 +772,13 @@ public class CompanionLocalController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(value = "/local.printLinkedCard")
-    public ResponseEntity<List<CardResponse>> printLinkedCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody List<PrintLinkedCardRequest> requestList) {
+    public ResponseEntity<CardResponse> printLinkedCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody PrintLinkedCardRequest request) {
 
-        List<CardResponse> responseList = new ArrayList<CardResponse>();
-        for (PrintLinkedCardRequest request : requestList) {
+        ToggleVoucherFeatureRequest toggleVoucherFeatureRequest = new ToggleVoucherFeatureRequest(request.getTransactionId(), request.getCardIdentifier(), "PHYSICAL_CARD_DISABLED", "1", request.getTransactionId(), request.getTransactionDate());
+        MultiValueMap<String, String> toggleVoucherHeaders = new HttpHeaders();
+
+        ResponseEntity<CardResponse> cardResponseResponseEntity = toggleVoucherFeature(toggleVoucherHeaders, toggleVoucherFeatureRequest);
+        if (((CardResponse) cardResponseResponseEntity.getBody()).getResponseStatus().equals("Approved")) {
             CardResponse response = new CardResponse();
             response.setCardIdentifier(request.getCardIdentifier());
             MethodCall methodCall = new MethodCall();
@@ -897,9 +901,13 @@ public class CompanionLocalController {
                 e.printStackTrace();
                 response.setResponseStatus(FAILED);
             }
-            responseList.add(response);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            CardResponse response = new CardResponse();
+            response.setResponseStatus(((CardResponse) cardResponseResponseEntity.getBody()).getResponseStatus());
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -989,10 +997,8 @@ public class CompanionLocalController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(value = "/local.toggleVoucherFeature")
-    public ResponseEntity<List<CardResponse>> toggleVoucherFeature(@RequestHeader MultiValueMap<String, String> headers, @RequestBody List<ToggleVoucherFeatureRequest> requestList) {
+    public ResponseEntity<CardResponse> toggleVoucherFeature(@RequestHeader MultiValueMap<String, String> headers, @RequestBody ToggleVoucherFeatureRequest request) {
 
-        List<CardResponse> responseList = new ArrayList<CardResponse>();
-        for (ToggleVoucherFeatureRequest request : requestList) {
             CardResponse response = new CardResponse();
             response.setCardIdentifier(request.getCardIdentifier());
             MethodCall methodCall = new MethodCall();
@@ -1073,9 +1079,7 @@ public class CompanionLocalController {
                 e.printStackTrace();
                 response.setResponseStatus(FAILED);
             }
-            responseList.add(response);
-        }
-        return new ResponseEntity<>(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
@@ -1137,5 +1141,21 @@ public class CompanionLocalController {
             return cd.getData();
         }
         return "";
+    }
+
+    public String getCompanionTutukaEndpoint() {
+        return companionTutukaEndpoint;
+    }
+
+    public void setCompanionTutukaEndpoint(String companionTutukaEndpoint) {
+        this.companionTutukaEndpoint = companionTutukaEndpoint;
+    }
+
+    public String getCompanionTutukaTerminalKey() {
+        return companionTutukaTerminalKey;
+    }
+
+    public void setCompanionTutukaTerminalKey(String companionTutukaTerminalKey) {
+        this.companionTutukaTerminalKey = companionTutukaTerminalKey;
     }
 }
