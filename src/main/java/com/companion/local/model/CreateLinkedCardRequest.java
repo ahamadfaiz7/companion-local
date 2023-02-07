@@ -24,6 +24,9 @@ public class CreateLinkedCardRequest implements Serializable {
         this.transactionDate = transactionDate;
     }
 
+    public CreateLinkedCardRequest() {
+    }
+
     public String getReference() {
         return reference;
     }

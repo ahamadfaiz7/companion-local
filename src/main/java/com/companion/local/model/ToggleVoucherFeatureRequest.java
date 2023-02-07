@@ -20,6 +20,9 @@ public class ToggleVoucherFeatureRequest implements Serializable {
         this.transactionDate = transactionDate;
     }
 
+    public ToggleVoucherFeatureRequest() {
+    }
+
     public String getReference() {
         return reference;
     }

@@ -10,6 +10,8 @@ public class UpdateBearerRequest extends CreateLinkedCardRequest implements Seri
         super(reference, firstName, lastName, idOrPassport, cellphoneNumber, expiryDate, transactionId, transactionDate);
     }
 
+    public UpdateBearerRequest() {
+    }
 
     public String getCardIdentifier() {
         return cardIdentifier;
