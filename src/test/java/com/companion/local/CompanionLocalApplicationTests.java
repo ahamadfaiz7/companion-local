@@ -31,25 +31,7 @@ class CompanionLocalApplicationTests {
         companionLocalController.setCompanionTutukaTerminalKey("FDB56993F7");
         MultiValueMap<String, String> headers = new HttpHeaders();
         CreateLinkedCardRequest createLinkedCardRequest = new CreateLinkedCardRequest("1372123433", "Faiz", "Ahamad", "Z3124325", "0842435881", "20401010T10:10:10", "6beebbae-98c2-4d74-97a8-a070645f4147", "20221216T10:10:10");
-        ResponseEntity<Serializable> responseEntity = companionLocalController.createCard(headers, createLinkedCardRequest);
-        assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
-        assertNotNull(((CreateLinkedCardResponse) responseEntity.getBody()).getCardNumber());
-        assertNotNull(((CreateLinkedCardResponse) responseEntity.getBody()).getCvv());
-        assertNotNull(((CreateLinkedCardResponse) responseEntity.getBody()).getExpiryDate());
-    }
-
-    public void testCreateLinkedCardMock() {
-        CreateLinkedCardResponse response = new CreateLinkedCardResponse();
-        response.setCvv("345");
-        response.setCardNumber("3456789766666");
-        response.setExpiryDate("20-1-2030");
-        CompanionLocalController listMock = mock(CompanionLocalController.class, "createCard");
-
-        MultiValueMap<String, String> headers = new HttpHeaders();
-        CreateLinkedCardRequest createLinkedCardRequest = new CreateLinkedCardRequest("1372123433", "Faiz", "Ahamad", "Z3124325", "0842435881", "20401010T10:10:10", "6beebbae-98c2-4d74-97a8-a070645f4147", "20221216T10:10:10");
-        when(companionLocalController.createCard(headers, createLinkedCardRequest)).thenReturn(new ResponseEntity<java.io.Serializable>(response, HttpStatus.OK));
-
-        ResponseEntity<Serializable> responseEntity = companionLocalController.createCard(headers, createLinkedCardRequest);
+        ResponseEntity responseEntity = companionLocalController.createCard(headers, createLinkedCardRequest);
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
         assertNotNull(((CreateLinkedCardResponse) responseEntity.getBody()).getCardNumber());
         assertNotNull(((CreateLinkedCardResponse) responseEntity.getBody()).getCvv());

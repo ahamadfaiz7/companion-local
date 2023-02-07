@@ -61,7 +61,7 @@ public class CompanionLocalController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(value = "/local.createLinkedCard")
-    public ResponseEntity<java.io.Serializable> createCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody CreateLinkedCardRequest request) {
+    public ResponseEntity<CreateLinkedCardResponse> createCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody CreateLinkedCardRequest request) {
         CreateLinkedCardResponse response = new CreateLinkedCardResponse();
         MethodCall methodCall = new MethodCall();
         Params params = new Params();
@@ -153,9 +153,9 @@ public class CompanionLocalController {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<java.io.Serializable>(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<java.io.Serializable>(response, HttpStatus.OK);
+        return new ResponseEntity(response, HttpStatus.OK);
 
     }
 
