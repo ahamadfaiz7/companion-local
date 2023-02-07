@@ -8,7 +8,6 @@ public class CreateLinkedCardResponse implements Serializable {
     private String expiryDate;
     private String cvv;
     private String trackingNumber;
-    private String responseStatus;
 
     public String getCardNumber() {
         return cardNumber;
@@ -42,11 +41,4 @@ public class CreateLinkedCardResponse implements Serializable {
         this.trackingNumber = trackingNumber;
     }
 
-    public String getResponseStatus() {
-        return responseStatus;
-    }
-
-    public void setResponseStatus(String responseStatus) {
-        this.responseStatus = responseStatus;
-    }
 }
