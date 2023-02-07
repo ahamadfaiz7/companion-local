@@ -11,6 +11,15 @@ public class ToggleVoucherFeatureRequest implements Serializable {
     private String transactionId;
     private String transactionDate;
 
+    public ToggleVoucherFeatureRequest(String reference, String cardIdentifier, String featureName, String featureStatus, String transactionId, String transactionDate) {
+        this.reference = reference;
+        this.cardIdentifier = cardIdentifier;
+        this.featureName = featureName;
+        this.featureStatus = featureStatus;
+        this.transactionId = transactionId;
+        this.transactionDate = transactionDate;
+    }
+
     public String getReference() {
         return reference;
     }
