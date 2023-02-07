@@ -13,6 +13,17 @@ public class CreateLinkedCardRequest implements Serializable {
     private String transactionId;
     private String transactionDate;
 
+    public CreateLinkedCardRequest(String reference, String firstName, String lastName, String idOrPassport, String cellphoneNumber, String expiryDate, String transactionId, String transactionDate) {
+        this.reference = reference;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.idOrPassport = idOrPassport;
+        this.cellphoneNumber = cellphoneNumber;
+        this.expiryDate = expiryDate;
+        this.transactionId = transactionId;
+        this.transactionDate = transactionDate;
+    }
+
     public String getReference() {
         return reference;
     }
