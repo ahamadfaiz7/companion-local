@@ -8,6 +8,16 @@ public class ActivateCardRequest implements Serializable {
     private String transactionId;
     private String transactionDate;
 
+    public ActivateCardRequest(String cardIdentifier, String transactionId, String transactionDate) {
+        this.cardIdentifier = cardIdentifier;
+        this.transactionId = transactionId;
+        this.transactionDate = transactionDate;
+    }
+    public ActivateCardRequest() {
+
+    }
+
+
     public String getCardIdentifier() {
         return cardIdentifier;
     }
