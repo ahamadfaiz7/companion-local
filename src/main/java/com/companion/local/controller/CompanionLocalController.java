@@ -892,7 +892,7 @@ public class CompanionLocalController {
                 response.setResponseStatus(getCharacterDataFromElement((Element) name.item(0)));
                 break;
             }
-            if (response.getResponseStatus().equalsIgnoreCase("q")) {
+            if (response.getResponseStatus().equalsIgnoreCase("Approved")) {
                 ToggleVoucherFeatureRequest toggleVoucherFeatureRequest = new ToggleVoucherFeatureRequest(request.getTransactionId(), request.getCardIdentifier(), "PHYSICAL_CARD_DISABLED", "0", request.getTransactionId(), request.getTransactionDate());
                 MultiValueMap<String, String> toggleVoucherHeaders = new HttpHeaders();
 
@@ -988,11 +988,7 @@ public class CompanionLocalController {
                 response.setResponseStatus(FAILED);
             }
 
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } else {
-            CardResponse response = new CardResponse();
-            response.setResponseStatus(((CardResponse) cardResponseResponseEntity.getBody()).getResponseStatus());
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return new ResponseEntity(response, HttpStatus.OK);
         }
         return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
