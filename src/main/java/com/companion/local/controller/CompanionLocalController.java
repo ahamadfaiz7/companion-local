@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.namedparam.NamedParameterUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -986,7 +987,12 @@ public class CompanionLocalController {
                 e.printStackTrace();
                 response.setResponseStatus(FAILED);
             }
-            responseList.add(response);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            CardResponse response = new CardResponse();
+            response.setResponseStatus(((CardResponse) cardResponseResponseEntity.getBody()).getResponseStatus());
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
         return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
