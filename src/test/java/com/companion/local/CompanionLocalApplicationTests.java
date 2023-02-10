@@ -67,7 +67,7 @@ class CompanionLocalApplicationTests {
 
     /**
      * Integration Test
-     * This will create the card in VE
+     * This will create/fetch the card from VE. if it's already  created will be fetched.
      */
     @Test
     public void testCreateLinkedCard() {
