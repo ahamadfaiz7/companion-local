@@ -1,16 +1,18 @@
 package com.companion.local.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper=false)
 public class UnstopCardRequest extends RetireCardRequest implements Serializable {
 
     private String note;
 
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
 }
