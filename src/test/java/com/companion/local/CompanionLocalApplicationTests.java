@@ -35,6 +35,7 @@ class CompanionLocalApplicationTests {
     private static List<ActivateCardResponse> activateCardResponses = new ArrayList<>();
     private static CardResponse cardResponse;
     private static List<CardResponse> cardResponses = new ArrayList<>();
+    private static  UpdateBearerRequest updateBearerRequest;
 
     @BeforeAll
     public static void loadPrerequisites() {
@@ -55,6 +56,9 @@ class CompanionLocalApplicationTests {
         cardResponse = new CardResponse();
         cardResponse.setResponseStatus("Approved");
         cardResponses.add(cardResponse);
+
+        updateBearerRequest = new UpdateBearerRequest("137212343390","Faiz","Ahamad","Z7867869087","0842435882","20401010T10:10:10","6beebbae-98c2-4d74-97a8-a070645f4147","20221216T10:10:10","5371645867106298");
+
 
     }
 
@@ -188,11 +192,26 @@ class CompanionLocalApplicationTests {
     @Test
     public void testUpdateBearerMock() {
         MultiValueMap<String, String> headers = new HttpHeaders();
-        List<UpdateBearerRequest> updateBearerRequest = new ArrayList<>();
+        UpdateBearerRequest updateBearerRequest = null;
         when(companionLocalControllerMock.updateBearer(headers, updateBearerRequest)).thenReturn(new ResponseEntity(cardResponses, HttpStatus.OK));
         ResponseEntity responseEntity = companionLocalControllerMock.updateBearer(headers, updateBearerRequest);
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
         assertNotNull(((List<CardResponse>) responseEntity.getBody()).get(0).getResponseStatus());
+
+    }
+
+    /**
+     * Integration Test
+     * This will update the cardholder details in VE
+     */
+    @Test
+    public void testUpdateBearer() {
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        ResponseEntity responseEntity = companionLocalController.updateBearer(headers, updateBearerRequest);
+        assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+        assertNotNull(((CardResponse) responseEntity.getBody()).getResponseStatus());
+        assertThat(((CardResponse) responseEntity.getBody()).getResponseStatus()).isEqualTo("Approved");
+
 
     }
 }

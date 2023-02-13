@@ -579,11 +579,8 @@ public class CompanionLocalController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(value = "/local.updateBearer")
-    public ResponseEntity<List<CardResponse>> updateBearer(@RequestHeader MultiValueMap<String, String> headers, @RequestBody List<UpdateBearerRequest> requestList) {
-
-        List<CardResponse> responseList = new ArrayList<CardResponse>();
-        for (UpdateBearerRequest request : requestList) {
-            CardResponse response = new CardResponse();
+    public ResponseEntity<CardResponse> updateBearer(@RequestHeader MultiValueMap<String, String> headers, @RequestBody UpdateBearerRequest request) {
+         CardResponse response = new CardResponse();
             response.setCardIdentifier(request.getCardIdentifier());
             MethodCall methodCall = new MethodCall();
             Params params = new Params();
@@ -674,9 +671,8 @@ public class CompanionLocalController {
                 e.printStackTrace();
                 response.setResponseStatus(FAILED);
             }
-            responseList.add(response);
-        }
-        return new ResponseEntity<>(responseList, HttpStatus.OK);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.OK)
