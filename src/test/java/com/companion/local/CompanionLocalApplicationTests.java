@@ -36,10 +36,11 @@ class CompanionLocalApplicationTests {
     private static CardResponse cardResponse;
     private static List<CardResponse> cardResponses = new ArrayList<>();
     private static  UpdateBearerRequest updateBearerRequest;
+    private static CardActionRequest cardActionRequest;
 
     @BeforeAll
     public static void loadPrerequisites() {
-        createLinkedCardRequest = new CreateLinkedCardRequest("1372123433", "Faiz", "Ahamad", "Z3124325", "0842435881", "20401010T10:10:10", "6beebbae-98c2-4d74-97a8-a070645f4147", "20221216T10:10:10");
+        createLinkedCardRequest = new CreateLinkedCardRequest("137212348687", "Faiz", "Ahamad", "Z3124325", "0842435881", "20401010T10:10:10", "6beebbae-98c2-4d74-97a8-a070645f4147", "20221216T10:10:10");
         createLinkedCardResponse = new CreateLinkedCardResponse();
         createLinkedCardResponse.setCvv("345");
         createLinkedCardResponse.setCardNumber("3456789766666");
@@ -57,9 +58,8 @@ class CompanionLocalApplicationTests {
         cardResponse.setResponseStatus("Approved");
         cardResponses.add(cardResponse);
 
+        cardActionRequest = new CardActionRequest("9901013706080","5371645854773381","6beebbae-98c2-4d74-97a8-a070645f4147","20221216T10:10:10");
         updateBearerRequest = new UpdateBearerRequest("137212343390","Faiz","Ahamad","Z7867869087","0842435882","20401010T10:10:10","6beebbae-98c2-4d74-97a8-a070645f4147","20221216T10:10:10","5371645867106298");
-
-
     }
 
     @BeforeEach
@@ -211,7 +211,32 @@ class CompanionLocalApplicationTests {
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
         assertNotNull(((CardResponse) responseEntity.getBody()).getResponseStatus());
         assertThat(((CardResponse) responseEntity.getBody()).getResponseStatus()).isEqualTo("Approved");
+    }
 
+    /**
+     * Integration Test
+     * This will fetch the card status from VE
+     */
+    @Test
+    public void testGetCardStatus() {
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        ResponseEntity responseEntity = companionLocalController.cardStatus(headers, cardActionRequest);
+        assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+        assertNotNull(((CardResponse) responseEntity.getBody()).getResponseStatus());
+        assertThat(((CardResponse) responseEntity.getBody()).getResponseStatus()).isEqualTo("valid");
+    }
 
+    /**
+     * Integration Test
+     * This will fetch the real time cards from VE
+     */
+    @Test
+    public void testGetLinkedCards() {
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        ResponseEntity responseEntity = companionLocalController.getLinkedCards(headers, getActiveCardRequests);
+        assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+        assertNotNull(((List<CreateLinkedCardResponse>) responseEntity.getBody()).get(0).getCardNumber());
+        assertNotNull(((List<CreateLinkedCardResponse>) responseEntity.getBody()).get(0).getCvv());
+        assertNotNull(((List<CreateLinkedCardResponse>) responseEntity.getBody()).get(0).getExpiryDate());
     }
 }
