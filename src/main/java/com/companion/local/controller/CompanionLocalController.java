@@ -509,10 +509,8 @@ public class CompanionLocalController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(value = "/local.retireCard")
-    public ResponseEntity<List<CardResponse>> retireCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody List<CardActionRequest> requestList) {
+    public ResponseEntity<CardResponse> retireCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody CardActionRequest request) {
 
-        List<CardResponse> responseList = new ArrayList<CardResponse>();
-        for (CardActionRequest request : requestList) {
             CardResponse response = new CardResponse();
             response.setCardIdentifier(request.getCardIdentifier());
             MethodCall methodCall = new MethodCall();
@@ -581,9 +579,8 @@ public class CompanionLocalController {
                 e.printStackTrace();
                 response.setResponseStatus(FAILED);
             }
-            responseList.add(response);
-        }
-        return new ResponseEntity<>(responseList, HttpStatus.OK);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
@@ -686,10 +683,8 @@ public class CompanionLocalController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(value = "/local.stopCard")
-    public ResponseEntity<List<CardResponse>> stopCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody List<StopCardRequest> requestList) {
+    public ResponseEntity<CardResponse> stopCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody StopCardRequest request) {
 
-        List<CardResponse> responseList = new ArrayList<CardResponse>();
-        for (StopCardRequest request : requestList) {
             CardResponse response = new CardResponse();
             response.setCardIdentifier(request.getCardIdentifier());
             MethodCall methodCall = new MethodCall();
@@ -770,9 +765,8 @@ public class CompanionLocalController {
                 e.printStackTrace();
                 response.setResponseStatus(FAILED);
             }
-            responseList.add(response);
-        }
-        return new ResponseEntity<>(responseList, HttpStatus.OK);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
@@ -914,10 +908,7 @@ public class CompanionLocalController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(value = "/local.unstopCard")
-    public ResponseEntity<List<CardResponse>> unstopCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody List<UnstopCardActionRequest> requestList) {
-
-        List<CardResponse> responseList = new ArrayList<CardResponse>();
-        for (UnstopCardActionRequest request : requestList) {
+    public ResponseEntity<CardResponse> unstopCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody UnstopCardActionRequest request) {
             CardResponse response = new CardResponse();
             response.setCardIdentifier(request.getCardIdentifier());
             MethodCall methodCall = new MethodCall();
@@ -992,10 +983,8 @@ public class CompanionLocalController {
                 e.printStackTrace();
                 response.setResponseStatus(FAILED);
             }
-
             return new ResponseEntity(response, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(responseList, HttpStatus.OK);
+
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -1321,6 +1310,24 @@ public class CompanionLocalController {
             response.setResponseStatus(FAILED);
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping(value = "/local.replaceVirtualCard")
+    public ResponseEntity<CreateLinkedCardResponse> replaceVirtualCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody ReplaceVirtualCardRequest request) {
+        ResponseEntity<CreateLinkedCardResponse> linkedCardResponse = null;
+        try {
+            ResponseEntity<CardResponse> response = retireCard(new HttpHeaders(), new CardActionRequest(request.getReference(), request.getOldCardIdentifier(), request.getTransactionId(), request.getTransactionDate()));
+            if (response.getBody().getResponseStatus().equalsIgnoreCase(APPROVED)) {
+                linkedCardResponse = createCard(new HttpHeaders(), new CreateLinkedCardRequest(request.getReference(), request.getFirstName(), request.getLastName(), request.getIdOrPassport(), request.getCellphoneNumber(), request.getExpiryDate(), request.getTransactionId(), request.getTransactionDate()));
+            } else {
+                return new ResponseEntity(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST);
+        }
+        return (linkedCardResponse);
     }
 
     /**

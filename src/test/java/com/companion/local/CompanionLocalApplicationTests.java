@@ -2,6 +2,7 @@ package com.companion.local;
 
 import com.companion.local.controller.CompanionLocalController;
 import com.companion.local.model.*;
+import com.companion.local.model.LinkedCards.TransferLinkCardResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,7 @@ class CompanionLocalApplicationTests {
     private static List<CardResponse> cardResponses = new ArrayList<>();
     private static  UpdateBearerRequest updateBearerRequest;
     private static CardActionRequest cardActionRequest;
+    private static TransferLinkCardRequest transferLinkCardRequest;
 
     @BeforeAll
     public static void loadPrerequisites() {
@@ -60,6 +62,8 @@ class CompanionLocalApplicationTests {
 
         cardActionRequest = new CardActionRequest("9901013706080","5371645854773381","6beebbae-98c2-4d74-97a8-a070645f4147","20221216T10:10:10");
         updateBearerRequest = new UpdateBearerRequest("137212343390","Faiz","Ahamad","Z7867869087","0842435882","20401010T10:10:10","6beebbae-98c2-4d74-97a8-a070645f4147","20221216T10:10:10","5371645867106298");
+
+        transferLinkCardRequest = new TransferLinkCardRequest("137284352847523","5371645871856201","5371645857108437","6beebbae-98c2-4d74-97a8-a070645f4147","20230207T10:10:10");
     }
 
     @BeforeEach
@@ -239,4 +243,20 @@ class CompanionLocalApplicationTests {
         assertNotNull(((List<CreateLinkedCardResponse>) responseEntity.getBody()).get(0).getCvv());
         assertNotNull(((List<CreateLinkedCardResponse>) responseEntity.getBody()).get(0).getExpiryDate());
     }
+
+    /**
+     * Integration Test
+     * This will transfer the link of card  in VE
+     */
+    @Test
+    public void testTransferLink() {
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        ResponseEntity responseEntity = companionLocalController.transferLink(headers, transferLinkCardRequest);
+        assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+        assertNotNull(((TransferLinkCardResponse) responseEntity.getBody()).getResponseStatus());
+        assertThat(((TransferLinkCardResponse) responseEntity.getBody()).getResponseStatus()).isEqualTo("Card already linked to a different reference");
+
+    }
+
+
 }
