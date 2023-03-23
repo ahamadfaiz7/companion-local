@@ -39,6 +39,8 @@ class CompanionLocalApplicationTests {
     private static  UpdateBearerRequest updateBearerRequest;
     private static CardActionRequest cardActionRequest;
     private static TransferLinkCardRequest transferLinkCardRequest;
+    private static StopCardRequest stopCardRequest;
+    private static UnstopCardActionRequest unstopCardActionRequest;
 
     @BeforeAll
     public static void loadPrerequisites() {
@@ -64,6 +66,10 @@ class CompanionLocalApplicationTests {
         updateBearerRequest = new UpdateBearerRequest("137212343390","Faiz","Ahamad","Z7867869087","0842435882","20401010T10:10:10","6beebbae-98c2-4d74-97a8-a070645f4147","20221216T10:10:10","5371645867106298");
 
         transferLinkCardRequest = new TransferLinkCardRequest("137284352847523","5371645871856201","5371645857108437","6beebbae-98c2-4d74-97a8-a070645f4147","20230207T10:10:10");
+
+        stopCardRequest = new StopCardRequest("137287878787","5371645802197113","","6beebbae-98c2-4d74-97a8-a070645f4147","20221216T10:10:10","1","Card is being consolidated");
+
+        unstopCardActionRequest = new UnstopCardActionRequest("137287878787","5371645802197113","6beebbae-98c2-4d74-97a8-a070645f4147","20221216T10:10:10","UnstopCard");
     }
 
     @BeforeEach
@@ -258,5 +264,29 @@ class CompanionLocalApplicationTests {
 
     }
 
+    /**
+     * Integration Test
+     * This will stop the card  in VE
+     */
+    @Test
+    public void testStopCard() {
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        ResponseEntity responseEntity = companionLocalController.stopCard(headers, stopCardRequest);
+        assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+        assertNotNull(((CardResponse) responseEntity.getBody()).getResponseStatus());
+        assertThat(((CardResponse) responseEntity.getBody()).getResponseStatus()).isEqualTo("Approved");
+    }
 
+    /**
+     * Integration Test
+     * This will un-stop the card  in VE
+     */
+    @Test
+    public void testUnstopStopCard() {
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        ResponseEntity responseEntity = companionLocalController.unstopCard(headers, unstopCardActionRequest);
+        assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+        assertNotNull(((CardResponse) responseEntity.getBody()).getResponseStatus());
+        assertThat(((CardResponse) responseEntity.getBody()).getResponseStatus()).isEqualTo("Approved");
+    }
 }

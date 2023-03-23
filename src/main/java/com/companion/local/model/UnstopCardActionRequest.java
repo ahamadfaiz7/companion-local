@@ -15,4 +15,8 @@ public class UnstopCardActionRequest extends CardActionRequest implements Serial
 
     private String note;
 
+    public UnstopCardActionRequest(String reference, String cardIdentifier, String transactionId, String transactionDate, String note) {
+        super(reference, cardIdentifier, transactionId, transactionDate);
+        this.note = note;
+    }
 }

@@ -1330,6 +1330,82 @@ public class CompanionLocalController {
         return (linkedCardResponse);
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping(value = "/local.updateCVV")
+    public ResponseEntity<CardResponse> updateCVV(@RequestHeader MultiValueMap<String, String> headers, @RequestBody RetireCardRequest request) {
+
+        CardResponse response = new CardResponse();
+        response.setCardIdentifier(request.getCardIdentifier());
+        MethodCall methodCall = new MethodCall();
+        Params params = new Params();
+        List<Param> paramList = new ArrayList<>();
+
+        Param param1 = new Param();
+        com.companion.local.request.Value value1 = new com.companion.local.request.Value();
+        value1.setString(TERMINAL_ID);
+        param1.setValue(value1);
+        paramList.add(param1);
+
+        Param param2 = new Param();
+        com.companion.local.request.Value value2 = new com.companion.local.request.Value();
+        value2.setString(request.getReference());
+        param2.setValue(value2);
+        paramList.add(param2);
+
+        Param param3 = new Param();
+        com.companion.local.request.Value value3 = new com.companion.local.request.Value();
+        value3.setString(request.getCardIdentifier());
+        param3.setValue(value3);
+        paramList.add(param3);
+
+        Param param4 = new Param();
+        com.companion.local.request.Value value4 = new com.companion.local.request.Value();
+        value4.setString(request.getTransactionId());
+        param4.setValue(value4);
+        paramList.add(param4);
+
+        Param param5 = new Param();
+        com.companion.local.request.Value value5 = new com.companion.local.request.Value();
+        value5.setDateTimeIso8601(request.getTransactionDate());
+        param5.setValue(value5);
+        paramList.add(param5);
+
+        Param param6 = new Param();
+        com.companion.local.request.Value value6 = new com.companion.local.request.Value();
+        value6.setString("");
+        param6.setValue(value6);
+        paramList.add(param6);
+
+
+        params.setParam(paramList);
+        methodCall.setMethodName("UpdateCVV");
+        methodCall.setParams(params);
+
+        String responseFromCompanionApi = null;
+
+        try {
+            responseFromCompanionApi = restTemplate.postForObject(companionTutukaEndpoint, generateRequestXmlString(methodCall), String.class);
+            DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            InputSource is = new InputSource();
+            is.setCharacterStream(new StringReader(responseFromCompanionApi));
+
+            Document doc = db.parse(is);
+            NodeList nodes = doc.getElementsByTagName(VALUE);
+
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Element element = (Element) nodes.item(i);
+                NodeList name = element.getElementsByTagName(STRING);
+                response.setResponseStatus(getCharacterDataFromElement((Element) name.item(0)));
+                break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setResponseStatus(FAILED);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     /**
      * generates the xml rpc string request
      *
