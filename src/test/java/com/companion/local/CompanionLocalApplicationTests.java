@@ -5,6 +5,7 @@ import com.companion.local.model.*;
 import com.companion.local.model.LinkedCards.TransferLinkCardResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -41,6 +42,7 @@ class CompanionLocalApplicationTests {
     private static TransferLinkCardRequest transferLinkCardRequest;
     private static StopCardRequest stopCardRequest;
     private static UnstopCardActionRequest unstopCardActionRequest;
+    private static RetireCardRequest retireCardRequest;
 
     @BeforeAll
     public static void loadPrerequisites() {
@@ -70,6 +72,8 @@ class CompanionLocalApplicationTests {
         stopCardRequest = new StopCardRequest("137287878787","5371645802197113","","6beebbae-98c2-4d74-97a8-a070645f4147","20221216T10:10:10","1","Card is being consolidated");
 
         unstopCardActionRequest = new UnstopCardActionRequest("137287878787","5371645802197113","6beebbae-98c2-4d74-97a8-a070645f4147","20221216T10:10:10","UnstopCard");
+
+        retireCardRequest = new RetireCardRequest("137212343390","5371645867106298","6beebbae-98c2-4d74-97a8-a070645f4147","20221216T10:10:10");
     }
 
     @BeforeEach
@@ -84,7 +88,7 @@ class CompanionLocalApplicationTests {
      * This will create/fetch the card from VE. if it's already  created will be fetched.
      */
     @Test
-    public void testCreateLinkedCard() {
+    void testCreateLinkedCard() {
 
         MultiValueMap<String, String> headers = new HttpHeaders();
         ResponseEntity responseEntity = companionLocalController.createCard(headers, createLinkedCardRequest);
@@ -99,7 +103,7 @@ class CompanionLocalApplicationTests {
      * This will NOT call VE & will return a dummy response
      */
     @Test
-    public void testCreateLinkedCardMock() {
+     void testCreateLinkedCardMock() {
         MultiValueMap<String, String> headers = new HttpHeaders();
         when(companionLocalControllerMock.createCard(headers, createLinkedCardRequest)).thenReturn(new ResponseEntity(createLinkedCardResponse, HttpStatus.OK));
         ResponseEntity responseEntity = companionLocalControllerMock.createCard(headers, createLinkedCardRequest);
@@ -115,7 +119,7 @@ class CompanionLocalApplicationTests {
      * This will fetch the real time cards from VE
      */
     @Test
-    public void testGetActiveLinkedCards() {
+     void testGetActiveLinkedCards() {
         MultiValueMap<String, String> headers = new HttpHeaders();
         ResponseEntity responseEntity = companionLocalController.getActiveLinkedCards(headers, getActiveCardRequests);
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
@@ -129,7 +133,7 @@ class CompanionLocalApplicationTests {
      * This will NOT call VE & will return a dummy response
      */
     @Test
-    public void testGetActiveLinkedCardsMock() {
+     void testGetActiveLinkedCardsMock() {
         MultiValueMap<String, String> headers = new HttpHeaders();
         when(companionLocalControllerMock.getActiveLinkedCards(headers, getActiveCardRequests)).thenReturn(new ResponseEntity(getActiveCardResponses, HttpStatus.OK));
         ResponseEntity responseEntity = companionLocalControllerMock.getActiveLinkedCards(headers, getActiveCardRequests);
@@ -145,7 +149,7 @@ class CompanionLocalApplicationTests {
      * This will activate the card in VE
      */
     @Test
-    public void testActivateCard() {
+     void testActivateCard() {
         MultiValueMap<String, String> headers = new HttpHeaders();
         ResponseEntity responseEntity = companionLocalController.activateCard(headers, activateCardRequestList);
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
@@ -157,7 +161,7 @@ class CompanionLocalApplicationTests {
      * This will NOT activate the card in VE,rather will return a dummy response
      */
     @Test
-    public void testActivateCardMock() {
+     void testActivateCardMock() {
         MultiValueMap<String, String> headers = new HttpHeaders();
         when(companionLocalControllerMock.activateCard(headers, activateCardRequestList)).thenReturn(new ResponseEntity(activateCardResponses, HttpStatus.OK));
         ResponseEntity responseEntity = companionLocalControllerMock.activateCard(headers, activateCardRequestList);
@@ -170,7 +174,7 @@ class CompanionLocalApplicationTests {
      * This will NOT print the card in VE,rather will return a dummy response
      */
     @Test
-    public void testPrintLinkedCardMock() {
+     void testPrintLinkedCardMock() {
         MultiValueMap<String, String> headers = new HttpHeaders();
         PrintLinkedCardRequest printLinkedCardRequest = new PrintLinkedCardRequest();
         when(companionLocalControllerMock.printLinkedCard(headers, printLinkedCardRequest)).thenReturn(new ResponseEntity(cardResponse, HttpStatus.OK));
@@ -185,7 +189,7 @@ class CompanionLocalApplicationTests {
      * This will NOT toggle the card feature in VE,rather will return a dummy response
      */
     @Test
-    public void testToggleVoucherFeatureMock() {
+     void testToggleVoucherFeatureMock() {
         MultiValueMap<String, String> headers = new HttpHeaders();
         ToggleVoucherFeatureRequest toggleVoucherFeatureRequest = new ToggleVoucherFeatureRequest();
         when(companionLocalControllerMock.toggleVoucherFeature(headers, toggleVoucherFeatureRequest)).thenReturn(new ResponseEntity(cardResponse, HttpStatus.OK));
@@ -200,7 +204,7 @@ class CompanionLocalApplicationTests {
      * This will NOT update the card bearer in VE,rather will return a dummy response
      */
     @Test
-    public void testUpdateBearerMock() {
+     void testUpdateBearerMock() {
         MultiValueMap<String, String> headers = new HttpHeaders();
         UpdateBearerRequest updateBearerRequest = null;
         when(companionLocalControllerMock.updateBearer(headers, updateBearerRequest)).thenReturn(new ResponseEntity(cardResponses, HttpStatus.OK));
@@ -215,7 +219,7 @@ class CompanionLocalApplicationTests {
      * This will update the cardholder details in VE
      */
     @Test
-    public void testUpdateBearer() {
+     void testUpdateBearer() {
         MultiValueMap<String, String> headers = new HttpHeaders();
         ResponseEntity responseEntity = companionLocalController.updateBearer(headers, updateBearerRequest);
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
@@ -228,7 +232,7 @@ class CompanionLocalApplicationTests {
      * This will fetch the card status from VE
      */
     @Test
-    public void testGetCardStatus() {
+     void testGetCardStatus() {
         MultiValueMap<String, String> headers = new HttpHeaders();
         ResponseEntity responseEntity = companionLocalController.cardStatus(headers, cardActionRequest);
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
@@ -241,7 +245,7 @@ class CompanionLocalApplicationTests {
      * This will fetch the real time cards from VE
      */
     @Test
-    public void testGetLinkedCards() {
+     void testGetLinkedCards() {
         MultiValueMap<String, String> headers = new HttpHeaders();
         ResponseEntity responseEntity = companionLocalController.getLinkedCards(headers, getActiveCardRequests);
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
@@ -255,7 +259,7 @@ class CompanionLocalApplicationTests {
      * This will transfer the link of card  in VE
      */
     @Test
-    public void testTransferLink() {
+     void testTransferLink() {
         MultiValueMap<String, String> headers = new HttpHeaders();
         ResponseEntity responseEntity = companionLocalController.transferLink(headers, transferLinkCardRequest);
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
@@ -269,12 +273,18 @@ class CompanionLocalApplicationTests {
      * This will stop the card  in VE
      */
     @Test
-    public void testStopCard() {
+    @Order(1)
+    void testStopCardUnstopCard() {
         MultiValueMap<String, String> headers = new HttpHeaders();
         ResponseEntity responseEntity = companionLocalController.stopCard(headers, stopCardRequest);
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
         assertNotNull(((CardResponse) responseEntity.getBody()).getResponseStatus());
         assertThat(((CardResponse) responseEntity.getBody()).getResponseStatus()).isEqualTo("Approved");
+
+        ResponseEntity unstopResponseEntity = companionLocalController.unstopCard(headers, unstopCardActionRequest);
+        assertThat(unstopResponseEntity.getStatusCodeValue()).isEqualTo(200);
+        assertNotNull(((CardResponse) unstopResponseEntity.getBody()).getResponseStatus());
+        assertThat(((CardResponse) unstopResponseEntity.getBody()).getResponseStatus()).isEqualTo("Approved");
     }
 
     /**
@@ -282,9 +292,9 @@ class CompanionLocalApplicationTests {
      * This will un-stop the card  in VE
      */
     @Test
-    public void testUnstopStopCard() {
+     void testUpdateCVV() {
         MultiValueMap<String, String> headers = new HttpHeaders();
-        ResponseEntity responseEntity = companionLocalController.unstopCard(headers, unstopCardActionRequest);
+        ResponseEntity responseEntity = companionLocalController.updateCVV(headers, retireCardRequest);
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
         assertNotNull(((CardResponse) responseEntity.getBody()).getResponseStatus());
         assertThat(((CardResponse) responseEntity.getBody()).getResponseStatus()).isEqualTo("Approved");

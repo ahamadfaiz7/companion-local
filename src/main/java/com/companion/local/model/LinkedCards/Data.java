@@ -6,7 +6,7 @@ import java.util.List;
 
 @XmlRootElement
 public class Data {
-    private List<Value> value = new ArrayList<Value>();
+    private List<Value> value = new ArrayList<>();
 
     public List<Value> getValue() {
         return value;

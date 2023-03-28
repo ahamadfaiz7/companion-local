@@ -33,10 +33,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/api")
@@ -57,8 +59,6 @@ public class CompanionLocalController {
     @Value("${companion.tutuka.uat.terminal.key}")
     private String companionTutukaTerminalKey;
 
-    private List<String> stringList = null;
-
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder.build();
@@ -73,7 +73,6 @@ public class CompanionLocalController {
         MethodCall methodCall = new MethodCall();
         Params params = new Params();
         List<Param> paramList = new ArrayList<>();
-        stringList = new ArrayList<>();
 
         Param param1 = new Param();
         com.companion.local.request.Value value1 = new com.companion.local.request.Value();
@@ -183,8 +182,6 @@ public class CompanionLocalController {
             value1.setString(TERMINAL_ID);
             param1.setValue(value1);
             paramList.add(param1);
-
-            stringList = new ArrayList<>();
 
             Param param2 = new Param();
             com.companion.local.request.Value value2 = new com.companion.local.request.Value();
@@ -895,7 +892,7 @@ public class CompanionLocalController {
                 ToggleVoucherFeatureRequest toggleVoucherFeatureRequest = new ToggleVoucherFeatureRequest(request.getTransactionId(), request.getCardIdentifier(), "PHYSICAL_CARD_DISABLED", "0", request.getTransactionId(), request.getTransactionDate());
                 MultiValueMap<String, String> toggleVoucherHeaders = new HttpHeaders();
 
-                ResponseEntity<CardResponse> cardResponseResponseEntity = toggleVoucherFeature(toggleVoucherHeaders, toggleVoucherFeatureRequest);
+                toggleVoucherFeature(toggleVoucherHeaders, toggleVoucherFeatureRequest);
             } else {
                 response.setResponseStatus(FAILED_RESPONSE);
             }
@@ -1318,7 +1315,7 @@ public class CompanionLocalController {
         ResponseEntity<CreateLinkedCardResponse> linkedCardResponse = null;
         try {
             ResponseEntity<CardResponse> response = retireCard(new HttpHeaders(), new CardActionRequest(request.getReference(), request.getOldCardIdentifier(), request.getTransactionId(), request.getTransactionDate()));
-            if (response.getBody().getResponseStatus().equalsIgnoreCase(APPROVED)) {
+            if (Objects.nonNull(response) && Objects.nonNull(response.getBody()) && response.getBody().getResponseStatus().equalsIgnoreCase(APPROVED)) {
                 linkedCardResponse = createCard(new HttpHeaders(), new CreateLinkedCardRequest(request.getReference(), request.getFirstName(), request.getLastName(), request.getIdOrPassport(), request.getCellphoneNumber(), request.getExpiryDate(), request.getTransactionId(), request.getTransactionDate()));
             } else {
                 return new ResponseEntity(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST);
@@ -1414,7 +1411,7 @@ public class CompanionLocalController {
      * @throws Exception
      */
     private String generateRequestXmlString(@RequestBody MethodCall request) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException, JAXBException {
-        List<com.companion.local.request.Value> valueList = request.getParams().getParam().stream().map(s -> s.getValue()).toList();
+        List<com.companion.local.request.Value> valueList = request.getParams().getParam().stream().map(Param::getValue).toList();
         String requestData = request.getMethodName();
         int count = 0;
         for (com.companion.local.request.Value val : valueList) {
@@ -1446,10 +1443,10 @@ public class CompanionLocalController {
      */
     private static String encode(String key, String data) throws NoSuchAlgorithmException, UnsupportedEncodingException, InvalidKeyException {
         Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
-        SecretKeySpec secret_key = new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA256");
+        SecretKeySpec secret_key = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
         sha256_HMAC.init(secret_key);
 
-        return Hex.encodeHexString(sha256_HMAC.doFinal(data.getBytes("UTF-8")));
+        return Hex.encodeHexString(sha256_HMAC.doFinal(data.getBytes(StandardCharsets.UTF_8)));
     }
 
     /**
