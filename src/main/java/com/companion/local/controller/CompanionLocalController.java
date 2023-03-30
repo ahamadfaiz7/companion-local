@@ -1403,6 +1403,130 @@ public class CompanionLocalController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping(value = "/local.orderCard")
+    public ResponseEntity<GenericCardResponse> orderCard(@RequestHeader MultiValueMap<String, String> headers, @RequestBody PrintLinkedCardRequest request) {
+        GenericCardResponse response = new GenericCardResponse();
+        MethodCall methodCall = new MethodCall();
+        Params params = new Params();
+        List<Param> paramList = new ArrayList<>();
+
+        Param param1 = new Param();
+        com.companion.local.request.Value value1 = new com.companion.local.request.Value();
+        value1.setString(TERMINAL_ID);
+        param1.setValue(value1);
+        paramList.add(param1);
+
+        Param param2 = new Param();
+        com.companion.local.request.Value value2 = new com.companion.local.request.Value();
+        value2.setString(request.getTitle());
+        param2.setValue(value2);
+        paramList.add(param2);
+
+        Param param3 = new Param();
+        com.companion.local.request.Value value3 = new com.companion.local.request.Value();
+        value3.setString(request.getInitials());
+        param3.setValue(value3);
+        paramList.add(param3);
+
+        Param param4 = new Param();
+        com.companion.local.request.Value value4 = new com.companion.local.request.Value();
+        value4.setString(request.getLastName());
+        param4.setValue(value4);
+        paramList.add(param4);
+
+        Param param5 = new Param();
+        com.companion.local.request.Value value5 = new com.companion.local.request.Value();
+        value5.setString(request.getAddress1());
+        param5.setValue(value5);
+        paramList.add(param5);
+
+        Param param6 = new Param();
+        com.companion.local.request.Value value6 = new com.companion.local.request.Value();
+        value6.setString(request.getAddress2());
+        param6.setValue(value6);
+        paramList.add(param6);
+
+        Param param7 = new Param();
+        com.companion.local.request.Value value7 = new com.companion.local.request.Value();
+        value7.setString(request.getAddress3());
+        param7.setValue(value7);
+        paramList.add(param7);
+
+
+        Param param8 = new Param();
+        com.companion.local.request.Value value8 = new com.companion.local.request.Value();
+        value8.setString(request.getAddress4());
+        param8.setValue(value8);
+        paramList.add(param8);
+
+        Param param9 = new Param();
+        com.companion.local.request.Value value9 = new com.companion.local.request.Value();
+        value9.setString(request.getAddress5());
+        param9.setValue(value9);
+        paramList.add(param9);
+
+        Param param10 = new Param();
+        com.companion.local.request.Value value10 = new com.companion.local.request.Value();
+        value10.setString(request.getAdditionalData());
+        param10.setValue(value10);
+        paramList.add(param10);
+
+
+        Param param11 = new Param();
+        com.companion.local.request.Value value11 = new com.companion.local.request.Value();
+        value11.setString(request.getTransactionId());
+        param11.setValue(value11);
+        paramList.add(param11);
+
+        Param param12 = new Param();
+        com.companion.local.request.Value value12 = new com.companion.local.request.Value();
+        value12.setDateTimeIso8601(request.getTransactionDate());
+        param12.setValue(value12);
+        paramList.add(param12);
+
+        Param param13 = new Param();
+        com.companion.local.request.Value value13 = new com.companion.local.request.Value();
+        value13.setString("");
+        param13.setValue(value13);
+        paramList.add(param13);
+
+        params.setParam(paramList);
+        methodCall.setMethodName("OrderCard");
+        methodCall.setParams(params);
+
+        String responseFromCompanionApi = null;
+
+        try {
+            responseFromCompanionApi = restTemplate.postForObject(companionTutukaEndpoint, generateRequestXmlString(methodCall), String.class);
+            DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            InputSource is = new InputSource();
+            is.setCharacterStream(new StringReader(responseFromCompanionApi));
+
+            Document doc = db.parse(is);
+            NodeList nodes = doc.getElementsByTagName(VALUE);
+
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Element element = (Element) nodes.item(i);
+                NodeList name = element.getElementsByTagName(STRING);
+                response.setResponseStatus(getCharacterDataFromElement((Element) name.item(0)));
+                break;
+            }
+            if (response.getResponseStatus().equalsIgnoreCase(APPROVED)) {
+                ToggleVoucherFeatureRequest toggleVoucherFeatureRequest = new ToggleVoucherFeatureRequest(request.getTransactionId(), request.getCardIdentifier(), "PHYSICAL_CARD_DISABLED", "0", request.getTransactionId(), request.getTransactionDate());
+                MultiValueMap<String, String> toggleVoucherHeaders = new HttpHeaders();
+
+                toggleVoucherFeature(toggleVoucherHeaders, toggleVoucherFeatureRequest);
+            } else {
+                response.setResponseStatus(FAILED_RESPONSE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setResponseStatus(FAILED_RESPONSE);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     /**
      * generates the xml rpc string request
      *
