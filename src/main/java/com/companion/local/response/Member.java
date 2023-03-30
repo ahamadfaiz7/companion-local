@@ -1,8 +1,7 @@
 package com.companion.local.response;
 
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 
 @XmlRootElement

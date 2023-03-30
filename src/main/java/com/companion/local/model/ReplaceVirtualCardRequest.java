@@ -11,12 +11,15 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
-public class ToggleVoucherFeatureRequest implements Serializable {
+public class ReplaceVirtualCardRequest implements Serializable {
 
     private String reference;
-    private String cardIdentifier;
-    private String featureName;
-    private String featureStatus;
+    private String oldCardIdentifier;
+    private String firstName;
+    private String lastName;
+    private String idOrPassport;
+    private String cellphoneNumber;
+    private String expiryDate;
     private String transactionId;
     private String transactionDate;
 }

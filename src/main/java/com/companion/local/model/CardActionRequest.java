@@ -11,8 +11,10 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
-public class UnstopCardRequest extends RetireCardRequest implements Serializable {
+public class CardActionRequest implements Serializable {
 
-    private String note;
-
+    private String reference;
+    private String cardIdentifier;
+    private String transactionId;
+    private String transactionDate;
 }

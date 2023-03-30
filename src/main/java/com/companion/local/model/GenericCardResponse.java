@@ -11,8 +11,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
-public class UnstopCardRequest extends RetireCardRequest implements Serializable {
-
-    private String note;
-
+public class GenericCardResponse implements Serializable {
+    private String responseStatus;
 }

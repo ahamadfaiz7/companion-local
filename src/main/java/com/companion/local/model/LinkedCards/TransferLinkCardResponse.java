@@ -1,4 +1,4 @@
-package com.companion.local.model;
+package com.companion.local.model.LinkedCards;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,8 +11,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
-public class UnstopCardRequest extends RetireCardRequest implements Serializable {
+public class TransferLinkCardResponse implements Serializable {
 
-    private String note;
-
+    private String oldCardIdentifier;
+    private String newCardIdentifier;
+    private String responseStatus;
 }
