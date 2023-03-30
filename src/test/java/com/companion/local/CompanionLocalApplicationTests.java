@@ -6,6 +6,8 @@ import com.companion.local.model.LinkedCards.TransferLinkCardResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -47,6 +49,10 @@ class CompanionLocalApplicationTests {
     @BeforeAll
     public static void loadPrerequisites() {
         createLinkedCardRequest = new CreateLinkedCardRequest("137212348687", "Faiz", "Ahamad", "Z3124325", "0842435881", "20401010T10:10:10", "6beebbae-98c2-4d74-97a8-a070645f4147", "20221216T10:10:10");
+
+    @BeforeAll
+    public static void loadPrerequisites() {
+        createLinkedCardRequest = new CreateLinkedCardRequest("1372123433", "Faiz", "Ahamad", "Z3124325", "0842435881", "20401010T10:10:10", "6beebbae-98c2-4d74-97a8-a070645f4147", "20221216T10:10:10");
         createLinkedCardResponse = new CreateLinkedCardResponse();
         createLinkedCardResponse.setCvv("345");
         createLinkedCardResponse.setCardNumber("3456789766666");
@@ -88,8 +94,7 @@ class CompanionLocalApplicationTests {
      * This will create/fetch the card from VE. if it's already  created will be fetched.
      */
     @Test
-    void testCreateLinkedCard() {
-
+     void testCreateLinkedCard() {
         MultiValueMap<String, String> headers = new HttpHeaders();
         ResponseEntity responseEntity = companionLocalController.createCard(headers, createLinkedCardRequest);
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
@@ -103,6 +108,7 @@ class CompanionLocalApplicationTests {
      * This will NOT call VE & will return a dummy response
      */
     @Test
+     void testCreateLinkedCardMock() {
      void testCreateLinkedCardMock() {
         MultiValueMap<String, String> headers = new HttpHeaders();
         when(companionLocalControllerMock.createCard(headers, createLinkedCardRequest)).thenReturn(new ResponseEntity(createLinkedCardResponse, HttpStatus.OK));
@@ -204,9 +210,10 @@ class CompanionLocalApplicationTests {
      * This will NOT update the card bearer in VE,rather will return a dummy response
      */
     @Test
+
      void testUpdateBearerMock() {
         MultiValueMap<String, String> headers = new HttpHeaders();
-        UpdateBearerRequest updateBearerRequest = null;
+        List<UpdateBearerRequest> updateBearerRequest = new ArrayList<>();
         when(companionLocalControllerMock.updateBearer(headers, updateBearerRequest)).thenReturn(new ResponseEntity(cardResponses, HttpStatus.OK));
         ResponseEntity responseEntity = companionLocalControllerMock.updateBearer(headers, updateBearerRequest);
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
